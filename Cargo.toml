@@ -1,0 +1,22 @@
+[package]
+name = "keyframe"
+description = "A simple library for smooth animation in Rust"
+
+readme = "README.md"
+license = "MIT"
+version = "1.0.0"
+edition = "2018"
+
+authors = ["Hannes Mann <hannesmann2000@gmail.com>"]
+keywords = ["animation", "transitions", "tweening", "easing", "math", "animation", "graphics", "gamedev"]
+categories = ["mathematics", "graphics"]
+
+[dependencies]
+num-traits = "0.2.10"
+
+# Optional, interoperability library for vectors
+mint = { version = "0.5.4", optional = true }
+
+[features]
+default = ["vectors"]
+vectors = ["mint"]
