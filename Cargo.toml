@@ -13,10 +13,4 @@ categories = ["mathematics", "graphics"]
 
 [dependencies]
 num-traits = "0.2.10"
-
-# Optional, interoperability library for vectors
-mint = { version = "0.5.4", optional = true }
-
-[features]
-default = ["vectors"]
-vectors = ["mint"]
+mint = "0.5.4"
