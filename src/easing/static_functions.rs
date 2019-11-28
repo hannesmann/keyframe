@@ -12,6 +12,7 @@ pub(crate) mod shorthand_functions {
 	use crate::easing::*;
 
 	/// Linear interpolation from point A to point B.
+	#[inline]
 	pub fn linear<V: CanEase, T: Float>(from: V, to: V, time: T) -> V { ease(Linear, from, to, time) } 
 }
 #[cfg(feature = "shorthand-easing-functions")]

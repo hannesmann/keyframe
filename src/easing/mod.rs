@@ -33,12 +33,14 @@ pub trait CanEase {
 }
 
 impl CanEase for f32 {
+	#[inline]
 	fn ease<T: Float>(from: Self, to: Self, position: T) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(position))
 	}
 }
 
 impl CanEase for f64 {
+	#[inline]
 	fn ease<T: Float>(from: Self, to: Self, position: T) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(position))
 	}
@@ -46,12 +48,14 @@ impl CanEase for f64 {
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Bounds are 0.0-1.0 for the X position but it can go out of bounds.
+#[inline]
 pub fn ease_with_unbounded_x<V: CanEase, X: Float>(function: impl EasingFunction, from: V, to: V, x: X) -> V {
 	V::ease::<X>(from, to, as_t(function.y(as_f64(x))))
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// The X position is limited to a range between 0.0 and 1.0.
+#[inline]
 pub fn ease<V: CanEase, X: Float>(function: impl EasingFunction, from: V, to: V, x: X) -> V {
 	ease_with_unbounded_x(function, from, to, match x {
 		_ if x < X::zero() => X::zero(),
@@ -62,6 +66,7 @@ pub fn ease<V: CanEase, X: Float>(function: impl EasingFunction, from: V, to: V,
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// The X position is limited to a range between 0.0 and `max_x`.
+#[inline]
 pub fn ease_with_scaled_x<V: CanEase, X: Float>(function: impl EasingFunction, from: V, to: V, x: X, max_x: X) -> V {
 	ease(function, from, to, match x {
 		_ if x < X::zero() => X::zero(),
@@ -75,6 +80,7 @@ mod vector_impls {
 	use crate::easing::*;
 
 	impl<V: Float> CanEase for Vector2<V> {
+		#[inline]
 		fn ease<T: Float>(from: Self, to: Self, position: T) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(position)),
@@ -84,6 +90,7 @@ mod vector_impls {
 	}
 
 	impl<V: Float> CanEase for Vector3<V> {
+		#[inline]
 		fn ease<T: Float>(from: Self, to: Self, position: T) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(position)),
@@ -94,6 +101,7 @@ mod vector_impls {
 	}
 
 	impl<V: Float> CanEase for Vector4<V> {
+		#[inline]
 		fn ease<T: Float>(from: Self, to: Self, position: T) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(position)),
