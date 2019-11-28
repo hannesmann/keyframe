@@ -16,10 +16,10 @@ num-traits = "0.2.10"
 mint = { version = "0.5.4", optional = true }
 
 [features]
-default = ["vectors", "shorthand-easing-functions"]
+default = ["vectors"]
 
 # Defines easing functions for mint's Vector2, Vector3 and Vector4
 vectors = ["mint"]
 
-# Defines shortcuts for common easing functions (ease_in_out, ease_out_bounce, etc) in keyframe::easing
-shorthand-easing-functions = []
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "docs/preview.html" ]

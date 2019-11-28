@@ -3,6 +3,8 @@ use crate::easing::*;
 // Based on https://gist.githubusercontent.com/gre/1650294/raw/01bf897e14c41f90c8fcda739fdc793790138446/easing.js
 
 /// Linear interpolation from point A to point B. Use with `ease(Linear, ...)`.
+/// 
+/// <div class="function-preview" data-function="t"></div>
 pub struct Linear;
 impl EasingFunction for Linear {
 	#[inline] 
@@ -10,6 +12,8 @@ impl EasingFunction for Linear {
 }
 
 /// Accelerating quadratically from point A to point B. Use with `ease(EaseInQuad, ...)`.
+/// 
+/// <div class="function-preview" data-function="t * t"></div>
 pub struct EaseInQuad;
 impl EasingFunction for EaseInQuad {
 	#[inline] 
@@ -17,6 +21,8 @@ impl EasingFunction for EaseInQuad {
 }
 
 /// Decelerating quadratically from point A to point B. Use with `ease(EaseOutQuad, ...)`.
+/// 
+/// <div class="function-preview" data-function="t * (2-t)"></div>
 pub struct EaseOutQuad;
 impl EasingFunction for EaseOutQuad {
 	#[inline] 
@@ -24,6 +30,8 @@ impl EasingFunction for EaseOutQuad {
 }
 
 /// Accelerating then decelerating quadratically from point A to point B. Use with `ease(EaseInOutQuad, ...)`.
+/// 
+/// <div class="function-preview" data-function="t<.5 ? 2*t*t : -1+(4-2*t)*t"></div>
 pub struct EaseInOutQuad;
 impl EasingFunction for EaseInOutQuad {
 	#[inline] 
@@ -31,27 +39,3 @@ impl EasingFunction for EaseInOutQuad {
 		if x < 0.5 { 2.0 * x * x } else { -1.0 + (4.0 - 2.0 * x) * x }
 	}
 }
-
-#[cfg(feature = "shorthand-easing-functions")]
-pub(crate) mod shorthand_functions {
-	use crate::easing::*;
-
-	/// Linear interpolation from point A to point B.
-	#[inline]
-	pub fn linear<V: CanEase, T: Float>(from: V, to: V, time: T) -> V { ease(Linear, from, to, time) } 
-
-	/// Accelerating quadratically from point A to point B.
-	#[inline]
-	pub fn ease_in<V: CanEase, T: Float>(from: V, to: V, time: T) -> V { ease(EaseInQuad, from, to, time) }
-	
-	/// Decelerating quadratically from point A to point B.
-	#[inline]
-	pub fn ease_out<V: CanEase, T: Float>(from: V, to: V, time: T) -> V { ease(EaseOutQuad, from, to, time) }
-
-	/// Accelerating then decelerating quadratically from point A to point B.
-	#[inline]
-	pub fn ease_in_out<V: CanEase, T: Float>(from: V, to: V, time: T) -> V { ease(EaseInOutQuad, from, to, time) }	
-	
-}
-#[cfg(feature = "shorthand-easing-functions")]
-pub use shorthand_functions::*;

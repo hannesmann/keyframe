@@ -1,0 +1,132 @@
+<!-- Preview for easing functions in docs.rs -->
+
+<style>
+	.function-preview {
+		position: relative;
+		display: inline-block;
+
+		width: 252px;
+		height: 102px;
+		margin: 10px;
+
+		border-left: 2px solid #d62d20;
+		border-bottom: 2px solid #d62d20;
+	}
+
+	.function-preview-ball {
+		width: 10px;
+		height: 10px;
+		background-color: #d62d20;
+		border-radius: 50%;
+
+		position: absolute;
+		right: -20px;
+		bottom: -6px;
+	}
+
+	.function-preview-x, .function-preview-y {
+		position: absolute;
+		margin: 0px;
+		width: 20px;
+		height: 20px;
+
+		text-align: center;
+		vertical-align: middle;
+
+		font-family: monospace;
+		font-size: 13px;
+		font-weight: bold;
+		font-style: italic;
+
+		color: #d62d20;
+	}
+
+	.function-preview-x {
+		width: 250px;
+		bottom: -25px;
+	}
+
+	.function-preview-y {
+		line-height: 100px;
+		height: 100px;
+		left: -25px;
+		top: 0px;
+	}
+</style>
+
+<script>
+	"use strict";
+	var ballsToAnimate = [];
+
+	document.addEventListener("DOMContentLoaded", function() {
+		document.querySelectorAll(".function-preview").forEach(function(val) {
+			var canvas = document.createElement("canvas");
+			canvas.style.width = "252px";
+			canvas.style.height = "102px";
+			canvas.width = 252 * 2;
+			canvas.height = 102 * 2;
+
+			var easingFunction;
+			eval("easingFunction = function(t) { return " + val.getAttribute("data-function") + " };");
+
+			var ctx = canvas.getContext("2d");
+			ctx.beginPath();
+			ctx.strokeStyle = "#d62d20";
+			ctx.lineWidth = "4";
+			ctx.moveTo(0, 100 * 2);
+
+			for(var x = 1; x < 250 * 2; x += 0.5) {
+				ctx.lineTo(x, 100 * 2 - (easingFunction(x / (248.0 * 2)) * 99 * 2));
+			}
+
+			ctx.lineTo(250 * 2, 0);
+
+			ctx.stroke();
+			val.appendChild(canvas);
+
+			var ball = document.createElement("div");
+			ball.className = "function-preview-ball";
+			ball.reverse = false;
+			ball.progress = 0.0;
+			ball.easingFunction = easingFunction;
+
+			ballsToAnimate[ballsToAnimate.length] = ball;
+
+			val.appendChild(ball);
+
+			var x = document.createElement("p");
+			x.innerText = "t";
+			x.className = "function-preview-x";
+			val.appendChild(x);
+
+			var y = document.createElement("p");
+			y.innerText = "y";
+			y.className = "function-preview-y";
+			val.appendChild(y);
+		});
+	});
+
+	var lastTick = performance.now();
+
+	function tick(now) {
+		var delta = (now - lastTick) / 1000.0;
+		lastTick = now;
+
+		ballsToAnimate.forEach(function(val) {
+			var oldProgress = val.progress;
+			val.progress += delta;
+
+			if(oldProgress < 1 && val.progress >= 1) {
+				val.reverse = !val.reverse;
+				val.progress = 0;
+			}
+
+			var position = -102 * (val.reverse ? 1 - val.easingFunction(val.progress) : val.easingFunction(val.progress));
+			val.style.transform = "translateY(" + position + "px)";
+		});
+
+		window.requestAnimationFrame(tick);
+	}
+
+	window.requestAnimationFrame(tick);
+</script>
