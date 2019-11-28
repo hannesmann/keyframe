@@ -1,4 +1,4 @@
-use crate::*;
+pub(crate) use crate::*;
 
 /// Implementation of a 2D curve function for use in easing between two points. 
 pub trait EasingFunction {
@@ -16,10 +16,10 @@ pub trait EasingFunction {
 }
 
 #[inline]
-fn as_f64<T: Float>(value: T) -> f64 { value.to_f64().expect(&format!("Value not representable in f64")) }
+pub(crate) fn as_f64<T: Float>(value: T) -> f64 { value.to_f64().expect(&format!("Value not representable in f64")) }
 
 #[inline]
-fn as_t<T: Float>(value: f64) -> T { 
+pub(crate) fn as_t<T: Float>(value: f64) -> T { 
 	match value {
 		_ if value > as_f64(T::max_value()) => T::max_value(),
 		_ if value < as_f64(T::min_value()) => T::min_value(),
@@ -70,13 +70,6 @@ pub fn ease_with_scaled_x<V: CanEase, X: Float>(function: impl EasingFunction, f
 	})
 }
 
-/// Linear interpolation from point A to point B. Use with `ease(Linear, ...)`.
-pub struct Linear;
-impl EasingFunction for Linear {
-	#[inline] 
-	fn y(&self, x: f64) -> f64 { x }
-}
-
 #[cfg(feature = "vectors")]
 mod vector_impls {
 	use crate::easing::*;
@@ -114,12 +107,5 @@ mod vector_impls {
 #[cfg(feature = "vectors")]
 pub use vector_impls::*;
 
-#[cfg(feature = "shorthand-easing-functions")]
-pub(crate) mod shorthand_functions {
-	use crate::easing::*;
-
-	/// Linear interpolation from point A to point B.
-	pub fn linear<V: CanEase, T: Float>(from: V, to: V, time: T) -> V { ease(Linear, from, to, time) } 
-}
-#[cfg(feature = "shorthand-easing-functions")]
-pub use shorthand_functions::*;
+mod static_functions;
+pub use static_functions::*;
