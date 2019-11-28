@@ -19,6 +19,7 @@ mint = { version = "0.5.4", optional = true }
 default = ["vectors"]
 
 # Defines easing functions for mint's Vector2, Vector3 and Vector4
+# Also required for BezierFunction
 vectors = ["mint"]
 
 [package.metadata.docs.rs]
