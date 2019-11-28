@@ -8,9 +8,6 @@
 		width: 252px;
 		height: 102px;
 		margin: 10px;
-
-		border-left: 2px solid #d62d20;
-		border-bottom: 2px solid #d62d20;
 	}
 
 	.function-preview-ball {
@@ -75,11 +72,9 @@
 			ctx.lineWidth = "4";
 			ctx.moveTo(0, 100 * 2);
 
-			for(var x = 1; x < 250 * 2; x += 0.5) {
-				ctx.lineTo(x, 100 * 2 - (easingFunction(x / (248.0 * 2)) * 99 * 2));
+			for(var x = 1; x <= 250 * 2; x += 0.5) {
+				ctx.lineTo(x, 100 * 2 - (easingFunction(x / (248.0 * 2)) * 98 * 2));
 			}
-
-			ctx.lineTo(250 * 2, 0);
 
 			ctx.stroke();
 			val.appendChild(canvas);
