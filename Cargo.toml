@@ -8,9 +8,18 @@ version = "1.0.0"
 edition = "2018"
 
 authors = ["Hannes Mann <hannesmann2000@gmail.com>"]
-keywords = ["animation", "transitions", "tweening", "easing", "math", "animation", "graphics", "gamedev"]
+keywords = ["animation", "keyframes", "transitions", "tweening", "easing", "math", "graphics", "gamedev"]
 categories = ["mathematics", "graphics"]
 
 [dependencies]
 num-traits = "0.2.10"
-mint = "0.5.4"
+mint = { version = "0.5.4", optional = true }
+
+[features]
+default = ["vectors", "shorthand-easing-functions"]
+
+# Defines easing functions for mint's Vector2, Vector3 and Vector4
+vectors = ["mint"]
+
+# Defines shortcuts for common easing functions (ease_in_out, ease_out_bounce, etc) in keyframe::easing
+shorthand-easing-functions = []
