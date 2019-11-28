@@ -1,9 +1,9 @@
 pub(crate) use crate::*;
 
-/// Implementation of a 2D curve function for use in easing between two points. 
+/// Implementation of a 2D curve function for easing between two points. 
 pub trait EasingFunction {
 	/// Based on an X position, calculate the Y position. 
-	/// 0.0-1.0 is start and end on both axes, both are allowed to go out of bounds. 
+	/// 0.0-1.0 is start and end on both axes but both are allowed to go out of bounds. 
 	/// 
 	/// # Note
 	/// 
@@ -27,7 +27,7 @@ pub(crate) fn as_t<T: Float>(value: f64) -> T {
 	}
 }
 
-/// Types that can be used with easing function.
+/// Types that can be used with an easing function.
 pub trait CanEase {
 	fn ease<T: Float>(from: Self, to: Self, position: T) -> Self;
 }
