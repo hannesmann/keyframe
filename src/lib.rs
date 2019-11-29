@@ -12,6 +12,11 @@ pub(crate) fn as_t<T: Float>(value: f64) -> T {
 }
 
 /// Definitions for various easing functions
+/// 
+/// <div class="function-preview" data-function="t" data-struct="Linear"></div>
+/// <div class="function-preview" data-function="t * t * t" data-struct="EaseIn"></div>
+/// <div class="function-preview" data-function="(--t) * t * t + 1" data-struct="EaseOut"></div>
+/// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1" data-struct="EaseInOut"></div>
 pub mod functions;
 use functions::*;
 

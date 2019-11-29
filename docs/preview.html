@@ -8,7 +8,7 @@
 		width: 260px;
 		height: 110px;
 
-		margin: 16px;
+		margin: 30px 40px 50px 20px;
 	}
 
 	.function-preview-ball {
@@ -22,7 +22,7 @@
 		bottom: calc(5px - 1px - 5px); /* shift to start of graph, then compensate for line width, then for ball height */
 	}
 
-	.function-preview-x, .function-preview-y {
+	.function-preview-x, .function-preview-y, .function-preview-title {
 		user-select: none;
 
 		position: absolute;
@@ -33,8 +33,8 @@
 		text-align: center;
 		vertical-align: middle;
 
-		font-family: "Inconsolata", monospace;
-		font-size: 16px;
+		font-family: "Source Code Pro", monospace;
+		font-size: 13px;
 		font-weight: bold;
 		font-style: italic;
 
@@ -52,6 +52,13 @@
 		height: 100px;
 		left: -25px;
 		top: 5px;
+	}
+
+	.function-preview-title {
+		font-style: normal;
+		width: auto;
+		left: 0px;
+		bottom: -50px;
 	}
 </style>
 
@@ -113,6 +120,14 @@
 				y.innerText = "y";
 				y.className = "function-preview-y";
 				val.appendChild(y);
+
+				if(val.getAttribute("data-struct") != null) {
+					var title = document.createElement("a");
+					title.innerText = "ease(" + val.getAttribute("data-struct") + ", ...)";
+					title.className = "function-preview-title";
+					title.href = window.location.href.replace("index.html", "struct." + val.getAttribute("data-struct") + ".html");
+					val.appendChild(title);
+				}
 			}
 		});
 
