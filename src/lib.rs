@@ -23,6 +23,16 @@ pub struct Keyframe<T: CanTween> {
 }
 
 impl<T: CanTween> Keyframe<T> {
+	/// Creates a new keyframe from the specified values.
+	/// If the time value is negative the keyframe will start at 0.0.
+	pub fn new<F: Float>(value: T, time: F, function: impl EasingFunction + 'static) -> Self {
+		Keyframe::<T> {
+			value: value,
+			time: if time < F::zero() { 0.0 } else { as_f64(time) },
+			function: Box::new(function)
+		}
+	}
+
 	/// The value of this keyframe
 	pub fn value(&self) -> T { self.value }
 
@@ -32,7 +42,7 @@ impl<T: CanTween> Keyframe<T> {
 	/// The easing function that will be used when tweening to another keyframe
 	pub fn function(&self) -> &dyn EasingFunction { self.function.as_ref() }
 
-	/// Returns the value between this keyframe and the next keyframe at the specified time.
+	/// Returns the value between this keyframe and the next keyframe at the specified time
 	/// 
 	/// # Note
 	/// 
@@ -54,4 +64,16 @@ impl<T: CanTween> Keyframe<T> {
 	}
 }
 
-// TODO: Keyframe, KeyframeSequence or AnimationSequence, impl CanTween for KeyframeSequence, animation! macro, examples
+impl<V: CanTween, T: Float, F: EasingFunction + 'static> From<(V, T, F)> for Keyframe<V> {
+	/// Creates a new keyframe from a tuple of (value, time, function).
+	/// If the time value is negative the keyframe will start at 0.0.
+	fn from(tuple: (V, T, F)) -> Self {
+		Keyframe::<V> {
+			value: tuple.0,
+			time: as_f64(tuple.1),
+			function: Box::new(tuple.2)
+		}
+	}
+}
+
+// TODO: KeyframeSequence, impl CanTween for KeyframeSequence, animation! macro, examples

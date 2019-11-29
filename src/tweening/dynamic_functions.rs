@@ -111,8 +111,8 @@ mod bezier {
 		/// 
 		/// # Arguments
 		/// 
-		/// * `p1` - The first of the two control points
-		/// * `p2` - The second of the two control points
+		/// * `p1` - The first of the two control points (range: 0.0 to 1.0)
+		/// * `p2` - The second of the two control points (range: 0.0 to 1.0)
 		pub fn from<T: Float>(p1: Vector2<T>, p2: Vector2<T>) -> BezierCurve {
 			let p1 = Self::limit_vector(p1);
 			let p2 = Self::limit_vector(p2);
