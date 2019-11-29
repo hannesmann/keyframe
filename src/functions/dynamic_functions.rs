@@ -142,6 +142,13 @@ mod bezier {
 			}
 		}
 	}
+
+	impl<T: Float> From<(Vector2<T>, Vector2<T>)> for BezierCurve {
+		/// Calculates a new cubic Bézier curve from a tuple of (p1, p2).
+		fn from(tuple: (Vector2<T>, Vector2<T>)) -> Self {
+			BezierCurve::from(tuple.0, tuple.1)
+		}
+	}
 }
 
 #[cfg(feature = "vectors")]
