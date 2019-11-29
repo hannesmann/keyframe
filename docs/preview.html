@@ -8,7 +8,7 @@
 		width: 260px;
 		height: 110px;
 
-		margin: 10px;
+		margin: 16px;
 	}
 
 	.function-preview-ball {
@@ -34,7 +34,7 @@
 		vertical-align: middle;
 
 		font-family: "Inconsolata", monospace;
-		font-size: 14px;
+		font-size: 16px;
 		font-weight: bold;
 		font-style: italic;
 
@@ -58,6 +58,8 @@
 <script>
 	"use strict";
 	var ballsToAnimate = [];
+	var lastScaleFactor = devicePixelRatio;
+	var lastTick = performance.now();
 
 	function drawOrRedrawPreviews() {
 		document.querySelectorAll(".function-preview").forEach(function(val) {
@@ -116,17 +118,13 @@
 
 	}
 
-	document.addEventListener("DOMContentLoaded", drawOrRedrawPreviews);
-
-	var lastScaleFactor = devicePixelRatio;
+	document.addEventListener("DOMContentLoaded", drawOrRedrawPreviews);	
 	window.addEventListener("resize", function() {
 		if(devicePixelRatio != lastScaleFactor) {
 			drawOrRedrawPreviews();
 			lastScaleFactor = devicePixelRatio;
 		}
 	}, true);
-
-	var lastTick = performance.now();
 
 	function tick(now) {
 		var delta = (now - lastTick) / 1000.0;

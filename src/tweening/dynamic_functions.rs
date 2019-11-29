@@ -8,27 +8,20 @@ mod bezier {
 	const SUBDIVISION_MAX_ITERATIONS: usize = 10;
 	const SAMPLE_TABLE_SIZE: usize = 11;
 
-	pub type CurvePoint = crate::Vector2<f32>;
-
-	/// User-defined cubic Bézier curve. Use with `ease(BezierCurve::from(...), ...)`.
+	/// User-defined cubic Bézier curve. Use with `ease(BezierCurve::from(...), ...)`
 	pub struct BezierCurve {
 		sample_table: [f32; SAMPLE_TABLE_SIZE],
-		p1: CurvePoint,
-		p2: CurvePoint
+		p1: Vector2<f32>,
+		p2: Vector2<f32>
 	}
 
 	// All of this is pretty much directly translated from https://github.com/gre/bezier-easing
 	impl BezierCurve {
-		#[inline]
 		fn a(x1: f32, x2: f32) -> f32 { 1.0 - 3.0 * x2 + 3.0 * x1 }
-		#[inline]
 		fn b(x1: f32, x2: f32) -> f32 { 3.0 * x2 - 6.0 * x1 }
-		#[inline]
 		fn c(x1: f32) -> f32 { 3.0 * x1 }
 
-		#[inline]
 		fn at(t: f32, x1: f32, x2: f32) -> f32 { ((Self::a(x1, x2) * t + Self::b(x1, x2)) * t + Self::c(x1)) * t }
-		#[inline]
 		fn slope(t: f32, x1: f32, x2: f32) -> f32 { 3.0 * Self::a(x1, x2) * t * t + 2.0 * Self::b(x1, x2) * t + Self::c(x1) }
 
 		fn newton_raphson(x: f32, guess: f32, x1: f32, x2: f32) -> f32 {
@@ -94,9 +87,13 @@ mod bezier {
 			}
 		}
 
-		#[inline]
-		fn limit_vector(c: CurvePoint) -> CurvePoint {
-			CurvePoint {
+		fn limit_vector<T: Float>(c: Vector2<T>) -> Vector2<f32> {
+			let c = Vector2::<f32> { 
+				x: as_t::<f32>(as_f64(c.x)),
+				y: as_t::<f32>(as_f64(c.y))
+			};
+
+			Vector2::<f32> {
 				x: match c.x {
 					_ if c.x < 0.0 => 0.0,
 					_ if c.x > 1.0 => 1.0,
@@ -110,13 +107,13 @@ mod bezier {
 			}
 		}
 
-		/// Calculates a new cubic Bézier curve. Mimics `transition-timing-function: cubic-bezier` as defined [here](https://www.w3.org/TR/css-easing-1/#cubic-bezier-easing-functions).
+		/// Calculates a new cubic Bézier curve. Mimics `transition-timing-function: cubic-bezier` as defined [here](https://www.w3.org/TR/css-easing-1/#cubic-bezier-easing-functions)
 		/// 
 		/// # Arguments
 		/// 
-		/// * `p1` - The first of the two control points.
-		/// * `p2` - The second of the two control points.
-		pub fn from(p1: CurvePoint, p2: CurvePoint) -> BezierCurve {
+		/// * `p1` - The first of the two control points
+		/// * `p2` - The second of the two control points
+		pub fn from<T: Float>(p1: Vector2<T>, p2: Vector2<T>) -> BezierCurve {
 			let p1 = Self::limit_vector(p1);
 			let p2 = Self::limit_vector(p2);
 
@@ -137,7 +134,6 @@ mod bezier {
 	}
 
 	impl EasingFunction for BezierCurve {
-		#[inline]
 		fn y(&self, x: f64) -> f64 { 
 			match x {
 				_ if x == 0.0 => 0.0,
