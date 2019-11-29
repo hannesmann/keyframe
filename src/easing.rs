@@ -15,6 +15,7 @@ pub trait EasingFunction {
 	fn y(&self, x: f64) -> f64;
 }
 
+/// Type that can be used with an easing function
 pub trait CanTween : Sized + Copy {
 	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self;
 }
@@ -57,9 +58,33 @@ pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunctio
 	})
 }
 
+/// Returns the value at a specified X position on an accelerating curve between point A and point B. 
+/// Time is limited to a range between 0.0 and 1.0.
+/// 
+/// <div class="function-preview" data-function="t * t * t"></div>
+pub fn ease_in<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
+	ease(functions::EaseIn, from, to, time)
+}
+
+/// Returns the value at a specified X position on a decelerating curve between point A and point B. 
+/// Time is limited to a range between 0.0 and 1.0.
+/// 
+/// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
+pub fn ease_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
+	ease(functions::EaseOut, from, to, time)
+}
+
+/// Returns the value at a specified X position on an accelerating and decelerating curve between point A and point B. 
+/// Time is limited to a range between 0.0 and 1.0.
+/// 
+/// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
+pub fn ease_in_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
+	ease(functions::EaseInOut, from, to, time)
+}
+
 #[cfg(feature = "vectors")]
 mod vector_impls {
-	use crate::tweening::*;
+	use crate::easing::*;
 
 	impl<V: Float> CanTween for Vector2<V> {
 		fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
@@ -91,11 +116,6 @@ mod vector_impls {
 		}
 	}
 }
+
 #[cfg(feature = "vectors")]
 pub use vector_impls::*;
-
-mod static_functions;
-pub use static_functions::*;
-
-mod dynamic_functions;
-pub use dynamic_functions::*;

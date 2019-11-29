@@ -1,6 +1,6 @@
 #[cfg(feature = "vectors")]
 mod bezier {
-	use crate::tweening::*;
+	use crate::easing::*;
 
 	const NEWTON_ITERTIONS: usize = 4;
 	const NEWTON_MIN_SLOPE: f32 = 0.001;

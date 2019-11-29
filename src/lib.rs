@@ -11,9 +11,12 @@ pub(crate) fn as_t<T: Float>(value: f64) -> T {
 	}
 }
 
-/// Types and definitions for various easing functions
-pub mod tweening;
-use tweening::*;
+/// Definitions for various easing functions
+pub mod functions;
+use functions::*;
+
+mod easing;
+pub use easing::*;
 
 /// Intermediate step in an animation sequence
 pub struct Keyframe<T: CanTween> {
@@ -75,5 +78,8 @@ impl<V: CanTween, T: Float, F: EasingFunction + 'static> From<(V, T, F)> for Key
 		}
 	}
 }
+
+mod sequence;
+pub use sequence::*;
 
 // TODO: KeyframeSequence, impl CanTween for KeyframeSequence, animation! macro, examples

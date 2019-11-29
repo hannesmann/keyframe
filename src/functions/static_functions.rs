@@ -1,4 +1,4 @@
-use crate::tweening::*;
+use crate::easing::*;
 
 // Based on https://gist.githubusercontent.com/gre/1650294/raw/01bf897e14c41f90c8fcda739fdc793790138446/easing.js
 
@@ -67,30 +67,6 @@ impl EasingFunction for EaseInOut {
 			x_minus_one * (2.0 * x - 2.0) * (2.0 * x - 2.0) + 1.0
 		}
 	}
-}
-
-/// Returns the value at a specified X position on an accelerating curve between point A and point B. 
-/// Time is limited to a range between 0.0 and 1.0.
-/// 
-/// <div class="function-preview" data-function="t * t * t"></div>
-pub fn ease_in<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
-	ease(EaseIn, from, to, time)
-}
-
-/// Returns the value at a specified X position on a decelerating curve between point A and point B. 
-/// Time is limited to a range between 0.0 and 1.0.
-/// 
-/// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
-pub fn ease_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
-	ease(EaseOut, from, to, time)
-}
-
-/// Returns the value at a specified X position on an accelerating and decelerating curve between point A and point B. 
-/// Time is limited to a range between 0.0 and 1.0.
-/// 
-/// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
-pub fn ease_in_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
-	ease(EaseInOut, from, to, time)
 }
 
 /// Accelerating quartically from point A to point B. Use with `ease(EaseInQuart, ...)`
