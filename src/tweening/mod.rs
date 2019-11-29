@@ -28,18 +28,18 @@ pub(crate) fn as_t<T: Float>(value: f64) -> T {
 }
 
 /// Types that can be used with an easing function.
-pub trait CanEase {
+pub trait CanTween {
 	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self;
 }
 
-impl CanEase for f32 {
+impl CanTween for f32 {
 	#[inline]
 	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(time))
 	}
 }
 
-impl CanEase for f64 {
+impl CanTween for f64 {
 	#[inline]
 	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(time))
@@ -49,14 +49,14 @@ impl CanEase for f64 {
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Bounds are 0.0-1.0 for the time argument but it can go out of bounds.
 #[inline]
-pub fn ease_with_unbounded_time<V: CanEase, T: Float>(function: impl EasingFunction, from: V, to: V, time: T) -> V {
+pub fn ease_with_unbounded_time<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T) -> V {
 	V::ease::<T>(from, to, as_t(function.y(as_f64(time))))
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Time is limited to a range between 0.0 and 1.0.
 #[inline]
-pub fn ease<V: CanEase, T: Float>(function: impl EasingFunction, from: V, to: V, time: T) -> V {
+pub fn ease<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T) -> V {
 	ease_with_unbounded_time(function, from, to, match time {
 		_ if time < T::zero() => T::zero(),
 		 _ if time > T::one() => T::one(),
@@ -67,7 +67,7 @@ pub fn ease<V: CanEase, T: Float>(function: impl EasingFunction, from: V, to: V,
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Time is limited to a range between 0.0 and `max_time`.
 #[inline]
-pub fn ease_with_scaled_time<V: CanEase, T: Float>(function: impl EasingFunction, from: V, to: V, time: T, max_time: T) -> V {
+pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T, max_time: T) -> V {
 	ease(function, from, to, match time {
 		_ if time < T::zero() => T::zero(),
 		 _ if time > max_time => T::one(),
@@ -77,9 +77,9 @@ pub fn ease_with_scaled_time<V: CanEase, T: Float>(function: impl EasingFunction
 
 #[cfg(feature = "vectors")]
 mod vector_impls {
-	use crate::easing::*;
+	use crate::tweening::*;
 
-	impl<V: Float> CanEase for Vector2<V> {
+	impl<V: Float> CanTween for Vector2<V> {
 		#[inline]
 		fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
 			Self {
@@ -89,7 +89,7 @@ mod vector_impls {
 		}
 	}
 
-	impl<V: Float> CanEase for Vector3<V> {
+	impl<V: Float> CanTween for Vector3<V> {
 		#[inline]
 		fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
 			Self {
@@ -100,7 +100,7 @@ mod vector_impls {
 		}
 	}
 
-	impl<V: Float> CanEase for Vector4<V> {
+	impl<V: Float> CanTween for Vector4<V> {
 		#[inline]
 		fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
 			Self {

@@ -1,4 +1,4 @@
-use crate::easing::*;
+use crate::tweening::*;
 
 // Based on https://gist.githubusercontent.com/gre/1650294/raw/01bf897e14c41f90c8fcda739fdc793790138446/easing.js
 
@@ -81,7 +81,7 @@ impl EasingFunction for EaseInOut {
 /// 
 /// <div class="function-preview" data-function="t * t * t"></div>
 #[inline]
-pub fn ease_in<V: CanEase, T: Float>(from: V, to: V, time: T) -> V {
+pub fn ease_in<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 	ease(EaseIn, from, to, time)
 }
 
@@ -90,7 +90,7 @@ pub fn ease_in<V: CanEase, T: Float>(from: V, to: V, time: T) -> V {
 /// 
 /// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
 #[inline]
-pub fn ease_out<V: CanEase, T: Float>(from: V, to: V, time: T) -> V {
+pub fn ease_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 	ease(EaseOut, from, to, time)
 }
 
@@ -99,7 +99,7 @@ pub fn ease_out<V: CanEase, T: Float>(from: V, to: V, time: T) -> V {
 /// 
 /// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
 #[inline]
-pub fn ease_in_out<V: CanEase, T: Float>(from: V, to: V, time: T) -> V {
+pub fn ease_in_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 	ease(EaseInOut, from, to, time)
 }
 
