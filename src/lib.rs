@@ -2,6 +2,8 @@ pub(crate) use num_traits::Float;
 #[cfg(feature = "vectors")]
 pub(crate) use mint::{Vector2, Vector3, Vector4};
 
+use std::fmt;
+
 pub(crate) fn as_f64<T: Float>(value: T) -> f64 { value.to_f64().expect(&format!("Value not representable in f64")) }
 pub(crate) fn as_t<T: Float>(value: f64) -> T { 
 	match value {
@@ -24,15 +26,20 @@ mod easing;
 pub use easing::*;
 
 /// Intermediate step in an animation sequence
-pub struct Keyframe<T: CanTween> {
+pub struct Keyframe<T: CanTween + Copy + Default> {
 	value: T,
 	time: f64,
 	function: Box<dyn EasingFunction>
 }
 
-impl<T: CanTween> Keyframe<T> {
+impl<T: CanTween + Copy + Default> Keyframe<T> {
 	/// Creates a new keyframe from the specified values.
 	/// If the time value is negative the keyframe will start at 0.0.
+	/// 
+	/// # Arguments
+	/// * `value` - The value that this keyframe will be tweened to/from
+	/// * `time` - The start time in seconds of this keyframe
+	/// * `function` - The easing function to use from the start of this keyframe to the start of the next keyframe
 	pub fn new<F: Float>(value: T, time: F, function: impl EasingFunction + 'static) -> Self {
 		Keyframe::<T> {
 			value: value,
@@ -44,7 +51,7 @@ impl<T: CanTween> Keyframe<T> {
 	/// The value of this keyframe
 	pub fn value(&self) -> T { self.value }
 
-	/// The time at which this keyframe starts in a sequence
+	/// The time in seconds at which this keyframe starts in a sequence
 	pub fn time<F: Float>(&self) -> F { as_t(self.time) }
 
 	/// The easing function that will be used when tweening to another keyframe
@@ -72,15 +79,19 @@ impl<T: CanTween> Keyframe<T> {
 	}
 }
 
-impl<V: CanTween, T: Float, F: EasingFunction + 'static> From<(V, T, F)> for Keyframe<V> {
+impl<V: CanTween + Copy + Default, T: Float, F: EasingFunction + 'static> From<(V, T, F)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time, function).
 	/// If the time value is negative the keyframe will start at 0.0.
-	fn from(tuple: (V, T, F)) -> Self {
-		Keyframe::<V> {
-			value: tuple.0,
-			time: as_f64(tuple.1),
-			function: Box::new(tuple.2)
-		}
+	fn from(tuple: (V, T, F)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), tuple.2) }
+}
+
+impl<T: CanTween + Copy + Default> Default for Keyframe<T> {
+	fn default() -> Self { Keyframe::new(T::default(), 0.0, Linear) }
+}
+
+impl<T: CanTween + Copy + Default + fmt::Display> fmt::Display for Keyframe<T> {
+	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+		write!(f, "Keyframe at {} s: {}", self.time, self.value)
 	}
 }
 

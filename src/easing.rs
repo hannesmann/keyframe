@@ -16,7 +16,7 @@ pub trait EasingFunction {
 }
 
 /// Type that can be used with an easing function
-pub trait CanTween : Sized + Copy {
+pub trait CanTween {
 	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self;
 }
 
