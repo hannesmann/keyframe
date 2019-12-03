@@ -87,7 +87,7 @@ mod bezier {
 			}
 		}
 
-		fn limit_vector<T: Float>(c: Vector2<T>) -> Vector2<f32> {
+		fn limit_vector(c: Vector2<impl Float>) -> Vector2<f32> {
 			let c = Vector2::<f32> { 
 				x: as_t::<f32>(as_f64(c.x)),
 				y: as_t::<f32>(as_f64(c.y))
@@ -113,7 +113,7 @@ mod bezier {
 		/// 
 		/// * `p1` - The first of the two control points (range: 0.0 to 1.0)
 		/// * `p2` - The second of the two control points (range: 0.0 to 1.0)
-		pub fn from<T: Float>(p1: Vector2<T>, p2: Vector2<T>) -> Self {
+		pub fn from(p1: Vector2<impl Float>, p2: Vector2<impl Float>) -> Self {
 			let p1 = Self::limit_vector(p1);
 			let p2 = Self::limit_vector(p2);
 

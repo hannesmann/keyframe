@@ -17,25 +17,25 @@ pub trait EasingFunction {
 
 /// Type that can be used with an easing function
 pub trait CanTween {
-	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self;
+	fn ease(from: Self, to: Self, time: impl Float) -> Self;
 }
 
 impl CanTween for f32 {
-	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
+	fn ease(from: Self, to: Self, time: impl Float) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(time))
 	}
 }
 
 impl CanTween for f64 {
-	fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
+	fn ease(from: Self, to: Self, time: impl Float) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(time))
 	}
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Bounds are 0.0-1.0 for the time argument but it can go out of bounds.
-pub fn ease_with_unbounded_time<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T) -> V {
-	V::ease::<T>(from, to, as_t(function.y(as_f64(time))))
+pub fn ease_with_unbounded_time<V: CanTween>(function: impl EasingFunction, from: V, to: V, time: impl Float) -> V {
+	V::ease(from, to, function.y(as_f64(time)))
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
@@ -87,7 +87,7 @@ mod vector_impls {
 	use crate::easing::*;
 
 	impl<V: Float> CanTween for Vector2<V> {
-		fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
+		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
 				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time))
@@ -96,7 +96,7 @@ mod vector_impls {
 	}
 
 	impl<V: Float> CanTween for Vector3<V> {
-		fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
+		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
 				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time)),
@@ -106,7 +106,7 @@ mod vector_impls {
 	}
 
 	impl<V: Float> CanTween for Vector4<V> {
-		fn ease<T: Float>(from: Self, to: Self, time: T) -> Self {
+		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
 				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time)),

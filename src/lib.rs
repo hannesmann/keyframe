@@ -4,7 +4,7 @@ pub(crate) use mint::{Vector2, Vector3, Vector4};
 
 use std::fmt;
 
-pub(crate) fn as_f64<T: Float>(value: T) -> f64 { value.to_f64().expect(&format!("Value not representable in f64")) }
+pub(crate) fn as_f64(value: impl Float) -> f64 { value.to_f64().expect(&format!("Value not representable in f64")) }
 pub(crate) fn as_t<T: Float>(value: f64) -> T { 
 	match value {
 		_ if value > as_f64(T::max_value()) => T::max_value(),
@@ -26,13 +26,13 @@ mod easing;
 pub use easing::*;
 
 /// Intermediate step in an animation sequence
-pub struct Keyframe<T: CanTween + Copy + Default> {
+pub struct Keyframe<T: CanTween + Copy + Default + Send + Sync> {
 	value: T,
 	time: f64,
-	function: Box<dyn EasingFunction>
+	function: Box<dyn EasingFunction + Send + Sync>
 }
 
-impl<T: CanTween + Copy + Default> Keyframe<T> {
+impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
 	/// Creates a new keyframe from the specified values.
 	/// If the time value is negative the keyframe will start at 0.0.
 	/// 
@@ -40,7 +40,7 @@ impl<T: CanTween + Copy + Default> Keyframe<T> {
 	/// * `value` - The value that this keyframe will be tweened to/from
 	/// * `time` - The start time in seconds of this keyframe
 	/// * `function` - The easing function to use from the start of this keyframe to the start of the next keyframe
-	pub fn new<F: Float>(value: T, time: F, function: impl EasingFunction + 'static) -> Self {
+	pub fn new<F: Float>(value: T, time: F, function: impl EasingFunction + 'static + Send + Sync) -> Self {
 		Keyframe::<T> {
 			value: value,
 			time: if time < F::zero() { 0.0 } else { as_f64(time) },
@@ -52,7 +52,7 @@ impl<T: CanTween + Copy + Default> Keyframe<T> {
 	pub fn value(&self) -> T { self.value }
 
 	/// The time in seconds at which this keyframe starts in a sequence
-	pub fn time<F: Float>(&self) -> F { as_t(self.time) }
+	pub fn time(&self) -> f64 { self.time }
 
 	/// The easing function that will be used when tweening to another keyframe
 	pub fn function(&self) -> &dyn EasingFunction { self.function.as_ref() }
@@ -79,17 +79,17 @@ impl<T: CanTween + Copy + Default> Keyframe<T> {
 	}
 }
 
-impl<V: CanTween + Copy + Default, T: Float, F: EasingFunction + 'static> From<(V, T, F)> for Keyframe<V> {
+impl<V: CanTween + Copy + Default + Send + Sync, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time, function).
 	/// If the time value is negative the keyframe will start at 0.0.
 	fn from(tuple: (V, T, F)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), tuple.2) }
 }
 
-impl<T: CanTween + Copy + Default> Default for Keyframe<T> {
+impl<T: CanTween + Copy + Default + Send + Sync> Default for Keyframe<T> {
 	fn default() -> Self { Keyframe::new(T::default(), 0.0, Linear) }
 }
 
-impl<T: CanTween + Copy + Default + fmt::Display> fmt::Display for Keyframe<T> {
+impl<T: CanTween + Copy + Default + Send + Sync + fmt::Display> fmt::Display for Keyframe<T> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		write!(f, "Keyframe at {} s: {}", self.time, self.value)
 	}
