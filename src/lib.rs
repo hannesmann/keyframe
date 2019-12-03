@@ -84,6 +84,14 @@ impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
 	}
 }
 
+impl<V: CanTween + Copy + Default + Send + Sync, T: Float> From<(V, T)> for Keyframe<V> {
+	/// Creates a new keyframe from a tuple of (value, time).
+	/// EaseInOut will be used as the easing function.
+	/// If the time value is negative the keyframe will start at 0.0.
+	#[inline]
+	fn from(tuple: (V, T)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), EaseInOut) }
+}
+
 impl<V: CanTween + Copy + Default + Send + Sync, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time, function).
 	/// If the time value is negative the keyframe will start at 0.0.

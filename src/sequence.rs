@@ -206,7 +206,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> Default for AnimationSequence<T
 
 impl<T: CanTween + Copy + Default + Send + Sync, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
 	fn from_iter<I2: IntoIterator<Item = I>>(iter: I2) -> Self {
-		let mut me = Self::default();
+		let mut me = Self::new();
 		for k in iter { me.insert_without_sorting(k.into()).ok(); } // Ignore the error, collisions will be discarded
 		me.sequence.sort_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
 		me
@@ -221,4 +221,22 @@ impl<'a, T: CanTween + Copy + Default + Send + Sync> IntoIterator for &'a Animat
 	fn into_iter(self) -> Self::IntoIter {
 		self.sequence.as_slice().into_iter()
 	}
+}
+
+/// Creates an [`AnimationSequence`](struct.AnimationSequence.html) containing any arguments that can be made into keyframes
+/// 
+/// # Note
+/// 
+/// While this macro can be used with [`Keyframe::new`](struct.Keyframe.html#method.new) it's recommended to specify your keyframes with tuples (for shorter code) like this: 
+/// ```
+/// keyframes![(0.0, 0.0), (0.5, 1.0), (1.0, 2.0), (1.5, 3.0, EaseOut), (2.0, 4.0)]
+/// ```
+#[macro_export]
+macro_rules! keyframes {
+	($($x: expr),*) => {{
+		let mut seq = AnimationSequence::new();
+		$( seq.insert_without_sorting($x.into()).ok(); )*
+		seq.sequence.sort_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+		seq
+	}};
 }
