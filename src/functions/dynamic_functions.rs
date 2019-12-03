@@ -17,11 +17,16 @@ mod bezier {
 
 	// All of this is pretty much directly translated from https://github.com/gre/bezier-easing
 	impl BezierCurve {
+		#[inline]
 		fn a(x1: f32, x2: f32) -> f32 { 1.0 - 3.0 * x2 + 3.0 * x1 }
+		#[inline]
 		fn b(x1: f32, x2: f32) -> f32 { 3.0 * x2 - 6.0 * x1 }
+		#[inline]
 		fn c(x1: f32) -> f32 { 3.0 * x1 }
 
+		#[inline]
 		fn at(t: f32, x1: f32, x2: f32) -> f32 { ((Self::a(x1, x2) * t + Self::b(x1, x2)) * t + Self::c(x1)) * t }
+		#[inline]
 		fn slope(t: f32, x1: f32, x2: f32) -> f32 { 3.0 * Self::a(x1, x2) * t * t + 2.0 * Self::b(x1, x2) * t + Self::c(x1) }
 
 		fn newton_raphson(x: f32, guess: f32, x1: f32, x2: f32) -> f32 {
@@ -134,6 +139,7 @@ mod bezier {
 	}
 
 	impl EasingFunction for BezierCurve {
+		#[inline]
 		fn y(&self, x: f64) -> f64 { 
 			match x {
 				_ if x == 0.0 => 0.0,
@@ -145,6 +151,7 @@ mod bezier {
 
 	impl<T: Float> From<(Vector2<T>, Vector2<T>)> for BezierCurve {
 		/// Calculates a new cubic Bézier curve from a tuple of (p1, p2).
+		#[inline]
 		fn from(tuple: (Vector2<T>, Vector2<T>)) -> Self {
 			BezierCurve::from(tuple.0, tuple.1)
 		}

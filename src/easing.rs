@@ -21,12 +21,14 @@ pub trait CanTween {
 }
 
 impl CanTween for f32 {
+	#[inline]
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(time))
 	}
 }
 
 impl CanTween for f64 {
+	#[inline]
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
 		as_t(as_f64(from + (to - from)) * as_f64(time))
 	}
@@ -34,12 +36,14 @@ impl CanTween for f64 {
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Bounds are 0.0-1.0 for the time argument but it can go out of bounds.
+#[inline]
 pub fn ease_with_unbounded_time<V: CanTween>(function: impl EasingFunction, from: V, to: V, time: impl Float) -> V {
 	V::ease(from, to, function.y(as_f64(time)))
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Time is limited to a range between 0.0 and 1.0.
+#[inline]
 pub fn ease<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T) -> V {
 	ease_with_unbounded_time(function, from, to, match time {
 		_ if time < T::zero() => T::zero(),
@@ -50,6 +54,7 @@ pub fn ease<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Time is limited to a range between 0.0 and `max_time`.
+#[inline]
 pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T, max_time: T) -> V {
 	ease(function, from, to, match time {
 		_ if time < T::zero() => T::zero(),
@@ -62,6 +67,7 @@ pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunctio
 /// Time is limited to a range between 0.0 and 1.0.
 /// 
 /// <div class="function-preview" data-function="t * t * t"></div>
+#[inline]
 pub fn ease_in<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 	ease(functions::EaseIn, from, to, time)
 }
@@ -70,6 +76,7 @@ pub fn ease_in<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 /// Time is limited to a range between 0.0 and 1.0.
 /// 
 /// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
+#[inline]
 pub fn ease_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 	ease(functions::EaseOut, from, to, time)
 }
@@ -78,6 +85,7 @@ pub fn ease_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 /// Time is limited to a range between 0.0 and 1.0.
 /// 
 /// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
+#[inline]
 pub fn ease_in_out<V: CanTween, T: Float>(from: V, to: V, time: T) -> V {
 	ease(functions::EaseInOut, from, to, time)
 }
@@ -87,6 +95,7 @@ mod vector_impls {
 	use crate::easing::*;
 
 	impl<V: Float> CanTween for Vector2<V> {
+		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
@@ -96,6 +105,7 @@ mod vector_impls {
 	}
 
 	impl<V: Float> CanTween for Vector3<V> {
+		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
@@ -106,6 +116,7 @@ mod vector_impls {
 	}
 
 	impl<V: Float> CanTween for Vector4<V> {
+		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),

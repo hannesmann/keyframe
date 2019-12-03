@@ -20,6 +20,7 @@ pub struct AnimationSequence<T: CanTween + Copy + Default + Send + Sync> {
 
 impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	/// Creates a new empty animation sequence.
+	#[inline]
 	pub fn new() -> Self { 	
 		AnimationSequence::<T> {
 			sequence: Vec::new(),
@@ -85,11 +86,10 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 		let old_len = self.keyframes();
 		self.sequence.retain(|k| k.time() != timestamp);
 
-		if self.time > self.duration() {
-			self.time = self.duration();
-		}
-
-		if old_len != self.keyframes() {
+		if old_len != self.keyframes() { // if anything was removed
+			if self.time > self.duration() {
+				self.time = self.duration();
+			}
 			self.update_current_keyframe();
 			true
 		}
@@ -97,9 +97,11 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	}
 
 	/// If this sequence has a keyframe at the exact timestamp
+	#[inline]
 	pub fn has_keyframe_at(&self, timestamp: f64) -> bool { self.into_iter().any(|k| k.time() == timestamp) }
 
 	/// The number of keyframes in this sequence
+	#[inline]
 	pub fn keyframes(&self) -> usize { self.sequence.len() }
 
 	/// The current pair of keyframes that are being animated (current, next)
@@ -111,6 +113,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	/// * The sequence has not reached the first keyframe: (`None`, current) is returned
 	/// * There is only one keyframe in this sequence and the sequence has reached it: (current, `None`) is returned
 	/// * The sequence has finished: (current, `None`) is returned
+	#[inline]
 	pub fn pair(&self) -> (Option<&Keyframe<T>>, Option<&Keyframe<T>>) {
 		match self.keyframe {
 			Some(c) if c == self.sequence.len() - 1 => (Some(&self.sequence[c]), None), 
@@ -121,6 +124,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	}
 
 	/// The current value of this sequence
+	#[inline]
 	pub fn now(&self) -> T {
 		match self.pair() {
 			(Some(s1), Some(s2)) => s1.tween_to(s2, self.time),
@@ -130,13 +134,14 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 		}
 	}
 
-	/// Advances this animation sequence by the duration specified.
+	/// Advances this sequence by the duration specified.
 	/// Returns `true` if this sequence is now finished.
+	#[inline]
 	pub fn advance_by(&mut self, duration: f64) -> bool {
 		self.advance_to(self.time() + duration)
 	}
 
-	/// Advances this animation sequence to the exact timestamp. 
+	/// Advances this sequence to the exact timestamp. 
 	/// Returns `true` if this sequence is now finished.
 	/// 
 	/// # Note
@@ -144,6 +149,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	/// The following applies if:
 	/// * The timestamp is negative: the sequence is set to `0.0`
 	/// * The timestamp is after the duration of the sequence: the sequence is set to `duration()`
+	#[inline]
 	pub fn advance_to(&mut self, timestamp: f64) -> bool {
 		self.time = match timestamp {
 			_ if timestamp < 0.0 => 0.0,
@@ -156,6 +162,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	}
 
 	/// The length in seconds of this sequence
+	#[inline]
 	pub fn duration(&self) -> f64 { 
 		// Keyframe::default means that if we only have one item in this collection 
 		// (meaning -2 is out of bounds) the maximum time will be 0.0
@@ -163,15 +170,18 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	}
 
 	/// The current progression of this sequence in seconds
+	#[inline]
 	pub fn time(&self) -> f64 { self.time }
 
 	/// The current progression of this sequence as a percentage
+	#[inline]
 	pub fn progress(&self) -> f64 { 
 		if self.duration() == 0.0 { 0.0 } else { self.time / self.duration() }
 	}
 
 	/// If this sequence has finished and is at the end. 
 	/// It can be reset with `advance_to(0.0)`.
+	#[inline]
 	pub fn finished(&self) -> bool { self.time == self.duration() }
 
 	/// Consumes this sequence and creates a new animation sequence which plays in reverse order
@@ -190,6 +200,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 }
 
 impl<T: CanTween + Copy + Default + Send + Sync> Default for AnimationSequence<T> {
+	#[inline]
 	fn default() -> Self { Self::new() }
 }
 
@@ -206,6 +217,7 @@ impl<'a, T: CanTween + Copy + Default + Send + Sync> IntoIterator for &'a Animat
 	type Item = &'a Keyframe<T>;
 	type IntoIter = std::slice::Iter<'a, Keyframe<T>>;
 
+	#[inline]
 	fn into_iter(self) -> Self::IntoIter {
 		self.sequence.as_slice().into_iter()
 	}

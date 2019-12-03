@@ -40,6 +40,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
 	/// * `value` - The value that this keyframe will be tweened to/from
 	/// * `time` - The start time in seconds of this keyframe
 	/// * `function` - The easing function to use from the start of this keyframe to the start of the next keyframe
+	#[inline]
 	pub fn new<F: Float>(value: T, time: F, function: impl EasingFunction + 'static + Send + Sync) -> Self {
 		Keyframe::<T> {
 			value: value,
@@ -49,12 +50,15 @@ impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
 	}
 
 	/// The value of this keyframe
+	#[inline]
 	pub fn value(&self) -> T { self.value }
 
 	/// The time in seconds at which this keyframe starts in a sequence
+	#[inline]
 	pub fn time(&self) -> f64 { self.time }
 
 	/// The easing function that will be used when tweening to another keyframe
+	#[inline]
 	pub fn function(&self) -> &dyn EasingFunction { self.function.as_ref() }
 
 	/// Returns the value between this keyframe and the next keyframe at the specified time
@@ -65,6 +69,7 @@ impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
 	/// * The requested time is before the start time of this keyframe: the value of this keyframe is returned
 	/// * The requested time is after the start time of next keyframe: the value of the next keyframe is returned
 	/// * The start time of the next keyframe is before the start time of this keyframe: the value of the next keyframe is returned
+	#[inline]
 	pub fn tween_to(&self, next: &Keyframe<T>, time: impl Float) -> T {
 		match as_f64(time) {
 			// If the requested time starts before this keyframe
@@ -82,14 +87,17 @@ impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
 impl<V: CanTween + Copy + Default + Send + Sync, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time, function).
 	/// If the time value is negative the keyframe will start at 0.0.
+	#[inline]
 	fn from(tuple: (V, T, F)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), tuple.2) }
 }
 
 impl<T: CanTween + Copy + Default + Send + Sync> Default for Keyframe<T> {
+	#[inline]
 	fn default() -> Self { Keyframe::new(T::default(), 0.0, Linear) }
 }
 
 impl<T: CanTween + Copy + Default + Send + Sync + fmt::Display> fmt::Display for Keyframe<T> {
+	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		write!(f, "Keyframe at {} s: {}", self.time, self.value)
 	}

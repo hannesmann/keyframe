@@ -7,6 +7,7 @@ use crate::easing::*;
 /// <div class="function-preview" data-function="t"></div>
 pub struct Linear;
 impl EasingFunction for Linear {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { x }
 }
 
@@ -15,6 +16,7 @@ impl EasingFunction for Linear {
 /// <div class="function-preview" data-function="t * t"></div>
 pub struct EaseInQuad;
 impl EasingFunction for EaseInQuad {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { x * x }
 }
 
@@ -23,6 +25,7 @@ impl EasingFunction for EaseInQuad {
 /// <div class="function-preview" data-function="t * (2-t)"></div>
 pub struct EaseOutQuad;
 impl EasingFunction for EaseOutQuad {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { x * (2.0 - x) }
 }
 
@@ -31,6 +34,7 @@ impl EasingFunction for EaseOutQuad {
 /// <div class="function-preview" data-function="t<.5 ? 2*t*t : -1+(4-2*t)*t"></div>
 pub struct EaseInOutQuad;
 impl EasingFunction for EaseInOutQuad {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		if x < 0.5 { 2.0 * x * x } else { -1.0 + (4.0 - 2.0 * x) * x }
 	}
@@ -41,6 +45,7 @@ impl EasingFunction for EaseInOutQuad {
 /// <div class="function-preview" data-function="t * t * t"></div>
 pub struct EaseIn;
 impl EasingFunction for EaseIn {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { x * x * x }
 }
 
@@ -49,6 +54,7 @@ impl EasingFunction for EaseIn {
 /// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
 pub struct EaseOut;
 impl EasingFunction for EaseOut {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		let x_minus_one = x - 1.0;
 		1.0 + x_minus_one * x_minus_one * x_minus_one
@@ -60,6 +66,7 @@ impl EasingFunction for EaseOut {
 /// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
 pub struct EaseInOut;
 impl EasingFunction for EaseInOut {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		if x < 0.5 { 4.0 * x * x * x } 
 		else { 
@@ -74,6 +81,7 @@ impl EasingFunction for EaseInOut {
 /// <div class="function-preview" data-function="t*t*t*t"></div>
 pub struct EaseInQuart;
 impl EasingFunction for EaseInQuart {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { x * x * x * x }
 }
 
@@ -82,6 +90,7 @@ impl EasingFunction for EaseInQuart {
 /// <div class="function-preview" data-function="1-(--t)*t*t*t"></div>
 pub struct EaseOutQuart;
 impl EasingFunction for EaseOutQuart {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		let x_minus_one = x - 1.0;
 		1.0 - x_minus_one * x_minus_one * x_minus_one * x_minus_one
@@ -93,6 +102,7 @@ impl EasingFunction for EaseOutQuart {
 /// <div class="function-preview" data-function="t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t"></div>
 pub struct EaseInOutQuart;
 impl EasingFunction for EaseInOutQuart {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		if x < 0.5 { 8.0 * x * x * x * x } 
 		else { 
@@ -107,6 +117,7 @@ impl EasingFunction for EaseInOutQuart {
 /// <div class="function-preview" data-function="t*t*t*t*t"></div>
 pub struct EaseInQuint;
 impl EasingFunction for EaseInQuint {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { x * x * x * x * x }
 }
 
@@ -115,6 +126,7 @@ impl EasingFunction for EaseInQuint {
 /// <div class="function-preview" data-function="1+(--t)*t*t*t*t"></div>
 pub struct EaseOutQuint;
 impl EasingFunction for EaseOutQuint {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		let x_minus_one = x - 1.0;
 		1.0 + x_minus_one * x_minus_one * x_minus_one * x_minus_one * x_minus_one
@@ -126,6 +138,7 @@ impl EasingFunction for EaseOutQuint {
 /// <div class="function-preview" data-function="t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t"></div>
 pub struct EaseInOutQuint;
 impl EasingFunction for EaseInOutQuint {
+	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		if x < 0.5 { 16.0 * x * x * x * x * x } 
 		else { 
