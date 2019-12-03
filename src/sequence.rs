@@ -204,10 +204,10 @@ impl<T: CanTween + Copy + Default + Send + Sync> Default for AnimationSequence<T
 	fn default() -> Self { Self::new() }
 }
 
-impl<T: CanTween + Copy + Default + Send + Sync> FromIterator<Keyframe<T>> for AnimationSequence<T> {
-	fn from_iter<I: IntoIterator<Item = Keyframe<T>>>(iter: I) -> Self {
+impl<T: CanTween + Copy + Default + Send + Sync, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
+	fn from_iter<I2: IntoIterator<Item = I>>(iter: I2) -> Self {
 		let mut me = Self::default();
-		for k in iter { me.insert_without_sorting(k).ok(); } // Ignore the error, collisions will be discarded
+		for k in iter { me.insert_without_sorting(k.into()).ok(); } // Ignore the error, collisions will be discarded
 		me.sequence.sort_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
 		me
 	}
