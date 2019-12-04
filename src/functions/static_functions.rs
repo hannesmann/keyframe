@@ -2,7 +2,7 @@ use crate::easing::*;
 
 // Based on https://gist.githubusercontent.com/gre/1650294/raw/01bf897e14c41f90c8fcda739fdc793790138446/easing.js
 
-/// Linear interpolation from point A to point B. Use with `ease(Linear, ...)`
+/// Linear interpolation from point A to point B
 /// 
 /// <div class="function-preview" data-function="t"></div>
 pub struct Linear;
@@ -11,7 +11,7 @@ impl EasingFunction for Linear {
 	fn y(&self, x: f64) -> f64 { x }
 }
 
-/// Accelerating quadratically from point A to point B. Use with `ease(EaseInQuad, ...)`
+/// Accelerating quadratically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t * t"></div>
 pub struct EaseInQuad;
@@ -20,7 +20,7 @@ impl EasingFunction for EaseInQuad {
 	fn y(&self, x: f64) -> f64 { x * x }
 }
 
-/// Decelerating quadratically from point A to point B. Use with `ease(EaseOutQuad, ...)`
+/// Decelerating quadratically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t * (2-t)"></div>
 pub struct EaseOutQuad;
@@ -29,7 +29,7 @@ impl EasingFunction for EaseOutQuad {
 	fn y(&self, x: f64) -> f64 { x * (2.0 - x) }
 }
 
-/// Accelerating then decelerating quadratically from point A to point B. Use with `ease(EaseInOutQuad, ...)`
+/// Accelerating then decelerating quadratically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t<.5 ? 2*t*t : -1+(4-2*t)*t"></div>
 pub struct EaseInOutQuad;
@@ -40,7 +40,7 @@ impl EasingFunction for EaseInOutQuad {
 	}
 }
 
-/// Accelerating cubically from point A to point B. Use with `ease(EaseIn, ...)`
+/// Accelerating cubically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t * t * t"></div>
 pub struct EaseIn;
@@ -49,7 +49,7 @@ impl EasingFunction for EaseIn {
 	fn y(&self, x: f64) -> f64 { x * x * x }
 }
 
-/// Decelerating cubically from point A to point B. Use with `ease(EaseOut, ...)`
+/// Decelerating cubically from point A to point B
 /// 
 /// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
 pub struct EaseOut;
@@ -61,7 +61,7 @@ impl EasingFunction for EaseOut {
 	}
 }
 
-/// Accelerating then decelerating cubically from point A to point B. Use with `ease(EaseInOut, ...)`
+/// Accelerating then decelerating cubically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
 pub struct EaseInOut;
@@ -76,7 +76,7 @@ impl EasingFunction for EaseInOut {
 	}
 }
 
-/// Accelerating quartically from point A to point B. Use with `ease(EaseInQuart, ...)`
+/// Accelerating quartically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t*t*t*t"></div>
 pub struct EaseInQuart;
@@ -85,7 +85,7 @@ impl EasingFunction for EaseInQuart {
 	fn y(&self, x: f64) -> f64 { x * x * x * x }
 }
 
-/// Decelerating quartically from point A to point B. Use with `ease(EaseOutQuart, ...)`
+/// Decelerating quartically from point A to point B
 /// 
 /// <div class="function-preview" data-function="1-(--t)*t*t*t"></div>
 pub struct EaseOutQuart;
@@ -97,7 +97,7 @@ impl EasingFunction for EaseOutQuart {
 	}
 }
 
-/// Accelerating then decelerating quartically from point A to point B. Use with `ease(EaseInOutQuart, ...)`
+/// Accelerating then decelerating quartically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t"></div>
 pub struct EaseInOutQuart;
@@ -112,7 +112,7 @@ impl EasingFunction for EaseInOutQuart {
 	}
 }
 
-/// Accelerating quintically from point A to point B. Use with `ease(EaseInQuint, ...)`
+/// Accelerating quintically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t*t*t*t*t"></div>
 pub struct EaseInQuint;
@@ -121,7 +121,7 @@ impl EasingFunction for EaseInQuint {
 	fn y(&self, x: f64) -> f64 { x * x * x * x * x }
 }
 
-/// Decelerating quintically from point A to point B. Use with `ease(EaseOutQuint, ...)`
+/// Decelerating quintically from point A to point B
 /// 
 /// <div class="function-preview" data-function="1+(--t)*t*t*t*t"></div>
 pub struct EaseOutQuint;
@@ -133,7 +133,7 @@ impl EasingFunction for EaseOutQuint {
 	}
 }
 
-/// Accelerating then decelerating quintically from point A to point B. Use with `ease(EaseInOutQuint, ...)`
+/// Accelerating then decelerating quintically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t"></div>
 pub struct EaseInOutQuint;

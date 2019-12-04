@@ -9,8 +9,8 @@ pub enum AnimationSequenceError {
 }
 
 /// A collection of keyframes that can be played back in sequence
-pub struct AnimationSequence<T: CanTween + Copy + Default + Send + Sync> {
-	sequence: Vec<Keyframe<T>>,
+pub struct AnimationSequence<T: CanTween + Copy + Default> {
+	pub(crate) sequence: Vec<Keyframe<T>>,
 
 	// Current item we're animating
 	keyframe: Option<usize>,
@@ -18,8 +18,8 @@ pub struct AnimationSequence<T: CanTween + Copy + Default + Send + Sync> {
 	time: f64
 }
 
-impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
-	/// Creates a new empty animation sequence.
+impl<T: CanTween + Copy + Default> AnimationSequence<T> {
+	/// Creates a new empty animation sequence
 	#[inline]
 	pub fn new() -> Self { 	
 		AnimationSequence::<T> {
@@ -199,12 +199,21 @@ impl<T: CanTween + Copy + Default + Send + Sync> AnimationSequence<T> {
 	}
 }
 
-impl<T: CanTween + Copy + Default + Send + Sync> Default for AnimationSequence<T> {
+impl<T: Float + CanTween + Copy + Default> AnimationSequence<T> {
+	/// Consumes this sequence and creates a normalized easing function which controls the 2D curve according to the keyframes in this sequence
+	/// 
+	/// # Note
+	/// 
+	/// This function is only implemented for one-dimensional float types, since each value corresponds to a Y position
+	pub fn to_easing_function(self) -> Keyframes { Keyframes::from_easing_function(self) }
+}
+
+impl<T: CanTween + Copy + Default> Default for AnimationSequence<T> {
 	#[inline]
 	fn default() -> Self { Self::new() }
 }
 
-impl<T: CanTween + Copy + Default + Send + Sync, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
+impl<T: CanTween + Copy + Default, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
 	fn from_iter<I2: IntoIterator<Item = I>>(iter: I2) -> Self {
 		let mut me = Self::new();
 		for k in iter { me.insert_without_sorting(k.into()).ok(); } // Ignore the error, collisions will be discarded
@@ -213,7 +222,7 @@ impl<T: CanTween + Copy + Default + Send + Sync, I: Into<Keyframe<T>>> FromItera
 	}
 }
 
-impl<'a, T: CanTween + Copy + Default + Send + Sync> IntoIterator for &'a AnimationSequence<T> {
+impl<'a, T: CanTween + Copy + Default> IntoIterator for &'a AnimationSequence<T> {
 	type Item = &'a Keyframe<T>;
 	type IntoIter = std::slice::Iter<'a, Keyframe<T>>;
 
@@ -223,7 +232,7 @@ impl<'a, T: CanTween + Copy + Default + Send + Sync> IntoIterator for &'a Animat
 	}
 }
 
-/// Creates an [`AnimationSequence`](struct.AnimationSequence.html) containing any arguments that can be made into keyframes
+/// Creates an animation sequence containing any arguments that can be made into keyframes
 /// 
 /// # Note
 /// 

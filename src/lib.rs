@@ -26,13 +26,13 @@ mod easing;
 pub use easing::*;
 
 /// Intermediate step in an animation sequence
-pub struct Keyframe<T: CanTween + Copy + Default + Send + Sync> {
-	value: T,
+pub struct Keyframe<T: CanTween + Copy + Default> {
+	pub(crate) value: T,
 	time: f64,
 	function: Box<dyn EasingFunction + Send + Sync>
 }
 
-impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
+impl<T: CanTween + Copy + Default> Keyframe<T> {
 	/// Creates a new keyframe from the specified values.
 	/// If the time value is negative the keyframe will start at 0.0.
 	/// 
@@ -84,27 +84,27 @@ impl<T: CanTween + Copy + Default + Send + Sync> Keyframe<T> {
 	}
 }
 
-impl<V: CanTween + Copy + Default + Send + Sync, T: Float> From<(V, T)> for Keyframe<V> {
+impl<V: CanTween + Copy + Default, T: Float> From<(V, T)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time).
-	/// EaseInOut will be used as the easing function.
+	/// `EaseInOut` will be used as the easing function.
 	/// If the time value is negative the keyframe will start at 0.0.
 	#[inline]
 	fn from(tuple: (V, T)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), EaseInOut) }
 }
 
-impl<V: CanTween + Copy + Default + Send + Sync, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for Keyframe<V> {
+impl<V: CanTween + Copy + Default, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time, function).
 	/// If the time value is negative the keyframe will start at 0.0.
 	#[inline]
 	fn from(tuple: (V, T, F)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), tuple.2) }
 }
 
-impl<T: CanTween + Copy + Default + Send + Sync> Default for Keyframe<T> {
+impl<T: CanTween + Copy + Default> Default for Keyframe<T> {
 	#[inline]
 	fn default() -> Self { Keyframe::new(T::default(), 0.0, Linear) }
 }
 
-impl<T: CanTween + Copy + Default + Send + Sync + fmt::Display> fmt::Display for Keyframe<T> {
+impl<T: CanTween + Copy + Default + fmt::Display> fmt::Display for Keyframe<T> {
 	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		write!(f, "Keyframe at {} s: {}", self.time, self.value)
@@ -113,5 +113,3 @@ impl<T: CanTween + Copy + Default + Send + Sync + fmt::Display> fmt::Display for
 
 mod sequence;
 pub use sequence::*;
-
-// TODO: KeyframeSequence, impl CanTween for KeyframeSequence, animation! macro, examples
