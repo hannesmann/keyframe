@@ -1,6 +1,7 @@
 use crate::easing::*;
 
 // Based on https://gist.githubusercontent.com/gre/1650294/raw/01bf897e14c41f90c8fcda739fdc793790138446/easing.js
+//      and https://github.com/warrenm/AHEasing/blob/master/AHEasing/easing.c
 
 /// Linear interpolation from point A to point B
 /// 
@@ -145,5 +146,38 @@ impl EasingFunction for EaseInOutQuint {
 			let x_minus_one = x - 1.0;
 			1.0 + 16.0 * x_minus_one * x_minus_one * x_minus_one * x_minus_one * x_minus_one
 		}
+	}
+}
+
+/// Accelerating on 1/4 of a sine wave from point A to point B
+/// 
+/// <div class="function-preview" data-function="Math.sin((t - 1) * Math.PI / 2) + 1"></div>
+pub struct EaseInSine;
+impl EasingFunction for EaseInSine {
+	#[inline]
+	fn y(&self, x: f64) -> f64 { 
+		((x - 1.0) * std::f64::consts::FRAC_PI_2).sin() + 1.0
+	}
+}
+
+/// Decelerating on 1/4 of a sine wave from point A to point B
+/// 
+/// <div class="function-preview" data-function="Math.sin(t * Math.PI / 2)"></div>
+pub struct EaseOutSine;
+impl EasingFunction for EaseOutSine {
+	#[inline]
+	fn y(&self, x: f64) -> f64 { 
+		(x * std::f64::consts::FRAC_PI_2).sin()
+	}
+}
+
+/// Accelerating then decelerating on 1/2 of a sine wave from point A to point B
+/// 
+/// <div class="function-preview" data-function=".5 * (1 - Math.cos(t * Math.PI))"></div>
+pub struct EaseInOutSine;
+impl EasingFunction for EaseInOutSine {
+	#[inline]
+	fn y(&self, x: f64) -> f64 { 
+		0.5 * (1.0 - (x * std::f64::consts::PI).cos())
 	}
 }

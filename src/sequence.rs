@@ -164,6 +164,8 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 	/// * The timestamp is after the duration of the sequence: the sequence is set to `duration()`
 	#[inline]
 	pub fn advance_to(&mut self, timestamp: f64) -> bool {
+		if self.time == timestamp { return self.finished() }
+		
 		self.time = match timestamp {
 			_ if timestamp < 0.0 => 0.0,
 			_ if timestamp > self.duration() => self.duration(),

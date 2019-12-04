@@ -3,6 +3,7 @@ name = "keyframe"
 description = "A simple library for smooth animation in Rust"
 
 readme = "README.md"
+repository = "https://github.com/HannesMann/keyframe"
 license = "MIT"
 version = "1.0.0"
 edition = "2018"

@@ -113,6 +113,3 @@ impl<T: CanTween + Copy + Default + fmt::Display> fmt::Display for Keyframe<T> {
 
 mod sequence;
 pub use sequence::*;
-
-#[cfg(test)]
-mod test;
