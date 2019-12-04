@@ -42,14 +42,12 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 		}
 	}
 
-	fn insert_without_sorting(&mut self, keyframe: Keyframe<T>) -> Result<(), AnimationSequenceError> {
+	fn insert_into_vec(&mut self, keyframe: Keyframe<T>) -> Result<(), AnimationSequenceError> {
 		if self.has_keyframe_at(keyframe.time()) { 
 			Err(AnimationSequenceError::TimeCollision(keyframe.time()))
 		}
 		else {
 			self.sequence.push(keyframe);
-			self.update_current_keyframe();
-
 			Ok(())
 		}
 	}
@@ -73,7 +71,7 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 				// * the item that comes next also has a later time
 				// * the first item has the earliest time
 				// * the last item has the last time (useful for remove_at)
-				self.sequence.sort_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+				self.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
 			}
 
 			self.update_current_keyframe();
@@ -81,12 +79,27 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 		}
 	}
 
-	/// Removes the keyframe from the sequence at the specified time. Returns true if a keyframe was actually removed.
-	pub fn remove_at(&mut self, timestamp: f64) -> bool {
-		let old_len = self.keyframes();
-		self.sequence.retain(|k| k.time() != timestamp);
+	/// Inserts several keyframes from an iterator all at once. 
+	/// This is faster because sorting only needs to be done after all the keyframes have been inserted.
+	pub fn insert_many(&mut self, keyframes: impl IntoIterator<Item = impl Into<Keyframe<T>>>) -> Result<(), AnimationSequenceError> {
+		for k in keyframes { self.insert_into_vec(k.into())?; }
+		self.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+		self.update_current_keyframe();
+		Ok(())
+	}	
 
-		if old_len != self.keyframes() { // if anything was removed
+	/// Removes the keyframe from the sequence at the specified time. Returns true if a keyframe was actually removed
+	pub fn remove(&mut self, timestamp: f64) -> bool { self.retain(|t| t != timestamp) }
+	/// Removes all keyframes from this sequence
+	pub fn clear(&mut self) { self.retain(|_| false); }
+
+	/// Retains only the keyframes specified by the predicate. Works the same as `Vec::retain`.
+	/// Returns true only if a keyframe was actually removed.
+	pub fn retain<F: FnMut(f64) -> bool>(&mut self, mut f: F) -> bool {
+		let old_len = self.keyframes();
+		self.sequence.retain(|k| f(k.time()));
+
+		if old_len != self.keyframes() {
 			if self.time > self.duration() {
 				self.time = self.duration();
 			}
@@ -164,9 +177,8 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 	/// The length in seconds of this sequence
 	#[inline]
 	pub fn duration(&self) -> f64 { 
-		// Keyframe::default means that if we only have one item in this collection 
-		// (meaning -2 is out of bounds) the maximum time will be 0.0
-		self.sequence.get(self.sequence.len() - 2).unwrap_or(&Keyframe::default()).time 
+		// Keyframe::default means that if we don't have any items in this collection (meaning - 1 is out of bounds) the maximum time will be 0.0
+		self.sequence.get(self.sequence.len().saturating_sub(1)).unwrap_or(&Keyframe::default()).time 
 	}
 
 	/// The current progression of this sequence in seconds
@@ -208,6 +220,24 @@ impl<T: Float + CanTween + Copy + Default> AnimationSequence<T> {
 	pub fn to_easing_function(self) -> Keyframes { Keyframes::from_easing_function(self) }
 }
 
+impl<T: CanTween + Copy + Default> From<Vec<Keyframe<T>>> for AnimationSequence<T> {
+	/// Creates a new animation sequence from a vector of keyframes
+	fn from(vec: Vec<Keyframe<T>>) -> Self {
+		let mut me = AnimationSequence::<T> {
+			sequence: vec,
+			keyframe: None,
+
+			time: 0.0
+		};
+
+		me.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+		me.sequence.dedup_by_key(|k| k.time());
+		me.update_current_keyframe();
+
+		me
+	}
+}
+
 impl<T: CanTween + Copy + Default> Default for AnimationSequence<T> {
 	#[inline]
 	fn default() -> Self { Self::new() }
@@ -216,8 +246,7 @@ impl<T: CanTween + Copy + Default> Default for AnimationSequence<T> {
 impl<T: CanTween + Copy + Default, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
 	fn from_iter<I2: IntoIterator<Item = I>>(iter: I2) -> Self {
 		let mut me = Self::new();
-		for k in iter { me.insert_without_sorting(k.into()).ok(); } // Ignore the error, collisions will be discarded
-		me.sequence.sort_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+		me.insert_many(iter).ok(); // Ignore errors, collisions will be discarded
 		me
 	}
 }
@@ -237,15 +266,15 @@ impl<'a, T: CanTween + Copy + Default> IntoIterator for &'a AnimationSequence<T>
 /// # Note
 /// 
 /// While this macro can be used with [`Keyframe::new`](struct.Keyframe.html#method.new) it's recommended to specify your keyframes with tuples (for shorter code) like this: 
-/// ```
+/// ```ignore
 /// keyframes![(0.0, 0.0), (0.5, 1.0), (1.0, 2.0), (1.5, 3.0, EaseOut), (2.0, 4.0)]
 /// ```
 #[macro_export]
 macro_rules! keyframes {
-	($($x: expr),*) => {{
-		let mut seq = AnimationSequence::new();
-		$( seq.insert_without_sorting($x.into()).ok(); )*
-		seq.sequence.sort_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
-		seq
+	() => (AnimationSequence::<f64>::default());
+	($($k: expr),*) => {{
+		let mut vec = Vec::new();
+		$( vec.push($k.into()); )*
+		AnimationSequence::from(vec)
 	}};
 }

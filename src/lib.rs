@@ -27,7 +27,7 @@ pub use easing::*;
 
 /// Intermediate step in an animation sequence
 pub struct Keyframe<T: CanTween + Copy + Default> {
-	pub(crate) value: T,
+	value: T,
 	time: f64,
 	function: Box<dyn EasingFunction + Send + Sync>
 }
@@ -113,3 +113,6 @@ impl<T: CanTween + Copy + Default + fmt::Display> fmt::Display for Keyframe<T> {
 
 mod sequence;
 pub use sequence::*;
+
+#[cfg(test)]
+mod test;

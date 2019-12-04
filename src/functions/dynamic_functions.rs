@@ -1,6 +1,4 @@
-use std::iter::FromIterator;
 use crate::*;
-
 pub(crate) const SAMPLE_TABLE_SIZE: usize = 15;
 
 #[cfg(feature = "vectors")]
@@ -192,15 +190,13 @@ impl Keyframes {
 
 impl EasingFunction for Keyframes {
 	fn y(&self, x: f64) -> f64 { 
-		let current_sample = (x * SAMPLE_TABLE_SIZE as f64).floor() as usize;
+		let current_sample = (x * SAMPLE_TABLE_SIZE as f64).floor() as i64;
 		let difference = x * SAMPLE_TABLE_SIZE as f64 - (x * SAMPLE_TABLE_SIZE as f64).floor();
 		let next_sample = current_sample + 1;
 
-		if next_sample >= SAMPLE_TABLE_SIZE {
-			self.0[current_sample]
-		} 
-		else {
-			self.0[current_sample] + (self.0[next_sample] - self.0[current_sample]) * difference
-		}
+		if next_sample >= SAMPLE_TABLE_SIZE as i64 { self.0[current_sample as usize] } 
+		else if current_sample == -1 { self.0[0] * difference }
+		else if current_sample < -1 { -self.0[0] } /* same as self.0[0] * -1 */
+		else { self.0[current_sample as usize] + (self.0[next_sample as usize] - self.0[current_sample as usize]) * difference }
 	}
 }

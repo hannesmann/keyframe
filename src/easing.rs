@@ -23,14 +23,14 @@ pub trait CanTween {
 impl CanTween for f32 {
 	#[inline]
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
-		as_t(as_f64(from + (to - from)) * as_f64(time))
+		as_t(as_f64(from) + as_f64(to - from) * as_f64(time))
 	}
 }
 
 impl CanTween for f64 {
 	#[inline]
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
-		as_t(as_f64(from + (to - from)) * as_f64(time))
+		as_t(as_f64(from) + as_f64(to - from) * as_f64(time))	
 	}
 }
 
