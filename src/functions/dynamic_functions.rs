@@ -11,6 +11,7 @@ mod bezier {
 	const SUBDIVISION_MAX_ITERATIONS: usize = 10;
 
 	/// User-defined cubic Bézier curve
+	#[derive(Copy, Clone, Debug)]
 	pub struct BezierCurve {
 		sample_table: [f32; SAMPLE_TABLE_SIZE],
 		p1: Vector2<f32>,
@@ -140,22 +141,14 @@ mod bezier {
 		}
 	}
 
-	impl EasingFunction for BezierCurve {
+	impl EasingFunction for &BezierCurve {
 		#[inline]
 		fn y(&self, x: f64) -> f64 { 
 			match x {
 				_ if x == 0.0 => 0.0,
 				_ if x == 1.0 => 1.0,
-				_ => Self::at(self.t_for_x(x as f32), self.p1.y, self.p2.y) as f64
+				_ => BezierCurve::at(self.t_for_x(x as f32), self.p1.y, self.p2.y) as f64
 			}
-		}
-	}
-
-	impl<T: Float> From<(Vector2<T>, Vector2<T>)> for BezierCurve {
-		/// Calculates a new cubic Bézier curve from a tuple of (p1, p2).
-		#[inline]
-		fn from(tuple: (Vector2<T>, Vector2<T>)) -> Self {
-			BezierCurve::from(tuple.0, tuple.1)
 		}
 	}
 }
@@ -188,7 +181,7 @@ impl Keyframes {
 	}
 }
 
-impl EasingFunction for Keyframes {
+impl EasingFunction for &Keyframes {
 	fn y(&self, x: f64) -> f64 { 
 		let current_sample = (x * SAMPLE_TABLE_SIZE as f64).floor() as i64;
 		let difference = x * SAMPLE_TABLE_SIZE as f64 - (x * SAMPLE_TABLE_SIZE as f64).floor();
