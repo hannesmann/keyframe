@@ -9,16 +9,16 @@ pub enum AnimationSequenceError {
 }
 
 /// A collection of keyframes that can be played back in sequence
-pub struct AnimationSequence<T: CanTween + Copy + Default> {
+pub struct AnimationSequence<T: CanTween + Copy> where Keyframe<T>: Default {
 	pub(crate) sequence: Vec<Keyframe<T>>,
 
 	// Current item we're animating
 	keyframe: Option<usize>,
 	// Current time
 	time: f64
-}
+} 
 
-impl<T: CanTween + Copy + Default> AnimationSequence<T> {
+impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	/// Creates a new empty animation sequence
 	#[inline]
 	pub fn new() -> Self { 	
@@ -126,7 +126,6 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 	/// * The sequence has not reached the first keyframe: (`None`, current) is returned
 	/// * There is only one keyframe in this sequence and the sequence has reached it: (current, `None`) is returned
 	/// * The sequence has finished: (current, `None`) is returned
-	#[inline]
 	pub fn pair(&self) -> (Option<&Keyframe<T>>, Option<&Keyframe<T>>) {
 		match self.keyframe {
 			Some(c) if c == self.sequence.len() - 1 => (Some(&self.sequence[c]), None), 
@@ -137,19 +136,17 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 	}
 
 	/// The current value of this sequence
-	#[inline]
 	pub fn now(&self) -> T {
 		match self.pair() {
 			(Some(s1), Some(s2)) => s1.tween_to(s2, self.time),
 			(Some(s1), None) => s1.value(),
 			(None, Some(s2)) => Keyframe::default().tween_to(s2, self.time),
-			(None, None) => T::default()
+			(None, None) => Keyframe::default().value()
 		}
 	}
 
 	/// Advances this sequence by the duration specified.
 	/// Returns `true` if this sequence is now finished.
-	#[inline]
 	pub fn advance_by(&mut self, duration: f64) -> bool {
 		self.advance_to(self.time() + duration)
 	}
@@ -162,7 +159,6 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 	/// The following applies if:
 	/// * The timestamp is negative: the sequence is set to `0.0`
 	/// * The timestamp is after the duration of the sequence: the sequence is set to `duration()`
-	#[inline]
 	pub fn advance_to(&mut self, timestamp: f64) -> bool {
 		if self.time == timestamp { return self.finished() }
 		
@@ -213,7 +209,7 @@ impl<T: CanTween + Copy + Default> AnimationSequence<T> {
 	}
 }
 
-impl<T: Float + CanTween + Copy + Default> AnimationSequence<T> {
+impl<T: Float + CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	/// Consumes this sequence and creates a normalized easing function which controls the 2D curve according to the keyframes in this sequence
 	/// 
 	/// # Note
@@ -222,7 +218,7 @@ impl<T: Float + CanTween + Copy + Default> AnimationSequence<T> {
 	pub fn to_easing_function(self) -> Keyframes { Keyframes::from_easing_function(self) }
 }
 
-impl<T: CanTween + Copy + Default> From<Vec<Keyframe<T>>> for AnimationSequence<T> {
+impl<T: CanTween + Copy> From<Vec<Keyframe<T>>> for AnimationSequence<T> where Keyframe<T>: Default {
 	/// Creates a new animation sequence from a vector of keyframes
 	fn from(vec: Vec<Keyframe<T>>) -> Self {
 		let mut me = AnimationSequence::<T> {
@@ -240,12 +236,12 @@ impl<T: CanTween + Copy + Default> From<Vec<Keyframe<T>>> for AnimationSequence<
 	}
 }
 
-impl<T: CanTween + Copy + Default> Default for AnimationSequence<T> {
+impl<T: CanTween + Copy> Default for AnimationSequence<T> where Keyframe<T>: Default {
 	#[inline]
 	fn default() -> Self { Self::new() }
 }
 
-impl<T: CanTween + Copy + Default, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
+impl<T: CanTween + Copy, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> where Keyframe<T>: Default {
 	/// Creates a new animation sequence from an iterator
 	fn from_iter<I2: IntoIterator<Item = I>>(iter: I2) -> Self {
 		let mut me = Self::new();
@@ -254,7 +250,7 @@ impl<T: CanTween + Copy + Default, I: Into<Keyframe<T>>> FromIterator<I> for Ani
 	}
 }
 
-impl<'a, T: CanTween + Copy + Default> IntoIterator for &'a AnimationSequence<T> {
+impl<'a, T: CanTween + Copy> IntoIterator for &'a AnimationSequence<T> where Keyframe<T>: Default {
 	type Item = &'a Keyframe<T>;
 	type IntoIter = std::slice::Iter<'a, Keyframe<T>>;
 

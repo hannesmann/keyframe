@@ -1,7 +1,7 @@
 use crate::*;
 pub(crate) const SAMPLE_TABLE_SIZE: usize = 15;
 
-#[cfg(feature = "vectors")]
+#[cfg(feature = "mint_types")]
 mod bezier {
 	use crate::functions::dynamic_functions::*;
 
@@ -153,14 +153,14 @@ mod bezier {
 	}
 }
 
-#[cfg(feature = "vectors")]
+#[cfg(feature = "mint_types")]
 pub use bezier::*;
 
 /// User-defined easing function which wraps a normalized [`AnimationSequence<Float>`](../struct.AnimationSequence.html)
 pub struct Keyframes([f64; SAMPLE_TABLE_SIZE]);
 
 impl Keyframes {
-	pub(crate) fn from_easing_function<T: Float + CanTween + Copy + Default>(s: AnimationSequence<T>) -> Self {
+	pub(crate) fn from_easing_function<T: Float + CanTween + Copy>(s: AnimationSequence<T>) -> Self where Keyframe<T>: Default {
 		let mut low_point = s.sequence.get(0).unwrap_or(&Keyframe::default()).value().to_f64().unwrap_or(0.0);
 		let mut high_point = s.sequence.get(s.keyframes() - 1).unwrap_or(&Keyframe::default()).value().to_f64().unwrap_or(1.0);
 		let max_time = s.duration();

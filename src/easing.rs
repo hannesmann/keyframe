@@ -63,8 +63,8 @@ pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunctio
 	})
 }
 
-#[cfg(feature = "vectors")]
-mod vector_impls {
+#[cfg(feature = "mint_types")]
+mod mint_type_impls {
 	use crate::easing::*;
 
 	impl<V: Float> CanTween for Vector2<V> {
@@ -99,7 +99,28 @@ mod vector_impls {
 			}
 		}
 	}
+
+	impl<V: Float> CanTween for Point2<V> {
+		#[inline]
+		fn ease(from: Self, to: Self, time: impl Float) -> Self {
+			Self {
+				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
+				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time))
+			}
+		}
+	}
+
+	impl<V: Float> CanTween for Point3<V> {
+		#[inline]
+		fn ease(from: Self, to: Self, time: impl Float) -> Self {
+			Self {
+				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
+				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time)),
+				z: as_t(as_f64(from.z + (to.z - from.z)) * as_f64(time))
+			}
+		}
+	}
 }
 
-#[cfg(feature = "vectors")]
-pub use vector_impls::*;
+#[cfg(feature = "mint_types")]
+pub use mint_type_impls::*;

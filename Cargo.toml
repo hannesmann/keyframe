@@ -16,12 +16,15 @@ categories = ["mathematics", "graphics"]
 num-traits = "0.2.10"
 mint = { version = "0.5.4", optional = true }
 
-[features]
-default = ["vectors"]
+[dev-dependencies]
+ggez = "0.5.1"
 
-# Defines easing functions for mint's Vector2, Vector3 and Vector4
+[features]
+default = ["mint_types"]
+
+# Defines easing functions for mint's Vector2, Vector3, Vector4, Point2 and Point3
 # Also required for BezierFunction
-vectors = ["mint"]
+mint_types = ["mint"]
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "docs/preview.html" ]
