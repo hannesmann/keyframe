@@ -246,6 +246,7 @@ impl<T: CanTween + Copy + Default> Default for AnimationSequence<T> {
 }
 
 impl<T: CanTween + Copy + Default, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
+	/// Creates a new animation sequence from an iterator
 	fn from_iter<I2: IntoIterator<Item = I>>(iter: I2) -> Self {
 		let mut me = Self::new();
 		me.insert_many(iter).ok(); // Ignore errors, collisions will be discarded
