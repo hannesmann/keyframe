@@ -27,11 +27,11 @@ Tweening:
 use keyframe::{ease, functions::*};
 
 fn example() -> f64 {
-	let a = 0.0;
-	let b = 2.0;
-	let time = 0.5;
+    let a = 0.0;
+    let b = 2.0;
+    let time = 0.5;
 
-	ease(EaseInOut, a, b, time)
+    ease(EaseInOut, a, b, time)
 }
 ```
 
@@ -44,16 +44,16 @@ extern crate keyframe;
 use keyframe::{Keyframe, AnimationSequence};
 
 fn example() {
-	// (value, time) or (value, time, function)
-	let sequence = keyframes![
-		(0.5, 0.0), 
-		(1.5, 0.3, EaseIn), // <-- EaseIn used from 0.0 to 0.3
-		(2.5, 1.0, Linear) // <-- Linear used from 0.3 to 1.0
-	];
+    // (value, time) or (value, time, function)
+    let sequence = keyframes![
+        (0.5, 0.0), 
+        (1.5, 0.3, EaseIn), // <-- EaseIn used from 0.0 to 0.3
+        (2.5, 1.0, Linear) // <-- Linear used from 0.3 to 1.0
+    ];
 
-	sequence.advance_by(0.65);
+    sequence.advance_by(0.65);
 
-	assert_eq!(sequence.now(), 2.0);
-	assert_eq!(sequence.duration(), 1.0);
+    assert_eq!(sequence.now(), 2.0);
+    assert_eq!(sequence.duration(), 1.0);
 }
 ```
