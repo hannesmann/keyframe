@@ -67,56 +67,56 @@ pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunctio
 mod mint_type_impls {
 	use crate::easing::*;
 
-	impl<V: Float> CanTween for Vector2<V> {
+	impl<V: CanTween> CanTween for Vector2<V> {
 		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
-				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
-				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time))
+				x: V::ease(from.x, to.x, time),
+				y: V::ease(from.y, to.y, time)
 			}
 		}
 	}
 
-	impl<V: Float> CanTween for Vector3<V> {
+	impl<V: CanTween> CanTween for Vector3<V> {
 		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
-				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
-				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time)),
-				z: as_t(as_f64(from.z + (to.z - from.z)) * as_f64(time))
+				x: V::ease(from.x, to.x, time),
+				y: V::ease(from.y, to.y, time),
+				z: V::ease(from.z, to.z, time)
 			}
 		}
 	}
 
-	impl<V: Float> CanTween for Vector4<V> {
+	impl<V: CanTween> CanTween for Vector4<V> {
 		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
-				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
-				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time)),
-				z: as_t(as_f64(from.z + (to.z - from.z)) * as_f64(time)),
-				w: as_t(as_f64(from.w + (to.w - from.w)) * as_f64(time))
+				x: V::ease(from.x, to.x, time),
+				y: V::ease(from.y, to.y, time),
+				z: V::ease(from.z, to.z, time),
+				w: V::ease(from.w, to.w, time)
 			}
 		}
 	}
 
-	impl<V: Float> CanTween for Point2<V> {
+	impl<V: CanTween> CanTween for Point2<V> {
 		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
-				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
-				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time))
+				x: V::ease(from.x, to.x, time),
+				y: V::ease(from.y, to.y, time)
 			}
 		}
 	}
 
-	impl<V: Float> CanTween for Point3<V> {
+	impl<V: CanTween> CanTween for Point3<V> {
 		#[inline]
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
-				x: as_t(as_f64(from.x + (to.x - from.x)) * as_f64(time)),
-				y: as_t(as_f64(from.y + (to.y - from.y)) * as_f64(time)),
-				z: as_t(as_f64(from.z + (to.z - from.z)) * as_f64(time))
+				x: V::ease(from.x, to.x, time),
+				y: V::ease(from.y, to.y, time),
+				z: V::ease(from.z, to.z, time)
 			}
 		}
 	}
