@@ -109,7 +109,7 @@ impl<T: CanTween + Copy + fmt::Display> fmt::Display for Keyframe<T> {
 impl<T: CanTween + Copy + fmt::Debug> fmt::Debug for Keyframe<T> {
 	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-		write!(f, "{{ value: {:?}, time: {:?} }}", self.value, self.time)
+		write!(f, "Keyframe {{ value: {:?}, time: {:?} }}", self.value, self.time)
 	}
 }
 
