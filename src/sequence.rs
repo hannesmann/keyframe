@@ -270,7 +270,7 @@ impl<'a, T: CanTween + Copy> IntoIterator for &'a AnimationSequence<T> where Key
 /// ```
 #[macro_export]
 macro_rules! keyframes {
-	() => (AnimationSequence::<f64>::default());
+	() => (AnimationSequence::default());
 	($($k: expr),*) => {{
 		let mut vec = Vec::new();
 		$( vec.push($k.into()); )*
