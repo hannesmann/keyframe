@@ -174,7 +174,7 @@ impl EasingFunction for EaseOut {
 /// Accelerating then decelerating on 1/2 of a sine wave from point A to point B
 /// 
 /// <div class="function-preview" data-function=".5 * (1 - Math.cos(t * Math.PI))"></div>
-pub struct EaseInOutSine;
+pub struct EaseInOut;
 impl EasingFunction for EaseInOut {
 	#[inline]
 	fn y(&self, x: f64) -> f64 { 

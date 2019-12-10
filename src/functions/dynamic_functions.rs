@@ -141,7 +141,7 @@ mod bezier {
 		}
 	}
 
-	impl EasingFunction for &BezierCurve {
+	impl EasingFunction for BezierCurve {
 		#[inline]
 		fn y(&self, x: f64) -> f64 { 
 			match x {
@@ -181,7 +181,7 @@ impl Keyframes {
 	}
 }
 
-impl EasingFunction for &Keyframes {
+impl EasingFunction for Keyframes {
 	fn y(&self, x: f64) -> f64 { 
 		let current_sample = (x * SAMPLE_TABLE_SIZE as f64).floor() as i64;
 		let difference = x * SAMPLE_TABLE_SIZE as f64 - (x * SAMPLE_TABLE_SIZE as f64).floor();

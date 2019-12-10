@@ -1,5 +1,7 @@
 pub(crate) use crate::*;
 
+use std::borrow::Borrow;
+
 /// Implementation of a 2D curve function for easing between two points
 pub trait EasingFunction {
 	/// For an X position on the curve, calculate the Y position. 
@@ -37,14 +39,14 @@ impl CanTween for f64 {
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Bounds are 0.0-1.0 for the time argument but it can go out of bounds.
 #[inline]
-pub fn ease_with_unbounded_time<V: CanTween>(function: impl EasingFunction, from: V, to: V, time: impl Float) -> V {
-	V::ease(from, to, function.y(as_f64(time)))
+pub fn ease_with_unbounded_time<V: CanTween, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: impl Float) -> V {
+	V::ease(from, to, function.borrow().y(as_f64(time)))
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Time is limited to a range between 0.0 and 1.0.
 #[inline]
-pub fn ease<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T) -> V {
+pub fn ease<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: T) -> V {
 	ease_with_unbounded_time(function, from, to, match time {
 		_ if time < T::zero() => T::zero(),
 		 _ if time > T::one() => T::one(),
@@ -55,7 +57,7 @@ pub fn ease<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Time is limited to a range between 0.0 and `max_time`.
 #[inline]
-pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T, max_time: T) -> V {
+pub fn ease_with_scaled_time<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: T, max_time: T) -> V {
 	ease(function, from, to, match time {
 		_ if time < T::zero() => T::zero(),
 		_ if time > max_time => T::one(),
