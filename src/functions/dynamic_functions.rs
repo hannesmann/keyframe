@@ -106,18 +106,15 @@ mod bezier {
 		/// 
 		/// # Arguments
 		/// 
-		/// * `p1` - The first of the two control points (range: 0.0 to 1.0)
-		/// * `p2` - The second of the two control points (range: 0.0 to 1.0)
+		/// * `p1` - The first of the two control points 
+		/// * `p2` - The second of the two control points
 		pub fn from(p1: Vector2<impl Float>, p2: Vector2<impl Float>) -> Self {
 			let p1 = Self::convert_vector(p1);
 			let p2 = Self::convert_vector(p2);
 
 			let mut arr = [0.0; SAMPLE_TABLE_SIZE];
-			let mut i = 0;
-
-			for value in (0..SAMPLE_TABLE_SIZE).map(|x| Self::at(x as f32 * 1.0 / (SAMPLE_TABLE_SIZE as f32 - 1.0), p1.x, p2.x)) {
+			for (i, value) in (0..SAMPLE_TABLE_SIZE).enumerate().map(|x| (x.0, Self::at(x.1 as f32 * 1.0 / (SAMPLE_TABLE_SIZE as f32 - 1.0), p1.x, p2.x))) {
 				arr[i] = value;
-				i += 1;
 			}
 
 			BezierCurve {

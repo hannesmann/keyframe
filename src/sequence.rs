@@ -166,6 +166,20 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 		}
 	}
 
+	/// Advances this sequence by the duration specified.
+	/// If this sequence becomes finished it will be automatically restarted and `true` is returned. 
+	pub fn advance_and_maybe_restart(&mut self, duration: f64) -> bool {
+		match self.advance_by(duration) {
+			(true, extra_time) => {
+				self.advance_to(0.0);
+				self.advance_and_maybe_restart(extra_time);
+				
+				true
+			},
+			(false, _) => false
+		}
+	}
+
 	/// Advances this sequence to the exact timestamp. 
 	/// Returns true and the remaining time (i.e. the amount that the specified duration overstepped the total duration of this sequence)
 	/// if this sequence is now finished.
@@ -214,7 +228,7 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	pub fn reverse(&mut self) {
 		let max_time = self.duration();
 		let mut reversed_vector = Vec::new();
-		
+
 		for i in (0..self.sequence.len()).rev() {
 			let mut k = self.sequence.remove(i);
 			k.time = max_time - k.time;
