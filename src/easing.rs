@@ -58,7 +58,7 @@ pub fn ease<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V
 pub fn ease_with_scaled_time<V: CanTween, T: Float>(function: impl EasingFunction, from: V, to: V, time: T, max_time: T) -> V {
 	ease(function, from, to, match time {
 		_ if time < T::zero() => T::zero(),
-		 _ if time > max_time => T::one(),
+		_ if time > max_time => T::one(),
 		_ => time / max_time
 	})
 }

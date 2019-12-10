@@ -146,21 +146,37 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	}
 
 	/// Advances this sequence by the duration specified.
-	/// Returns `true` if this sequence is now finished.
-	pub fn advance_by(&mut self, duration: f64) -> bool {
+	/// Returns true and the remaining time (i.e. the amount that the specified duration overstepped the total duration of this sequence)
+	/// if this sequence is now finished.
+	pub fn advance_by(&mut self, duration: f64) -> (bool, f64) {
 		self.advance_to(self.time() + duration)
 	}
 
+	/// Advances this sequence by the duration specified.
+	/// If this sequence becomes finished it will be automatically reversed and `true` is returned. 
+	pub fn advance_and_maybe_reverse(&mut self, duration: f64) -> bool {
+		match self.advance_by(duration) {
+			(true, extra_time) => {
+				self.reverse();
+				self.advance_and_maybe_reverse(extra_time);
+				
+				true
+			},
+			(false, _) => false
+		}
+	}
+
 	/// Advances this sequence to the exact timestamp. 
-	/// Returns `true` if this sequence is now finished.
+	/// Returns true and the remaining time (i.e. the amount that the specified duration overstepped the total duration of this sequence)
+	/// if this sequence is now finished.
 	/// 
 	/// # Note
 	/// 
 	/// The following applies if:
 	/// * The timestamp is negative: the sequence is set to `0.0`
 	/// * The timestamp is after the duration of the sequence: the sequence is set to `duration()`
-	pub fn advance_to(&mut self, timestamp: f64) -> bool {
-		if self.time == timestamp { return self.finished() }
+	pub fn advance_to(&mut self, timestamp: f64) -> (bool, f64) {
+		if self.time == timestamp { return (self.finished(), 0.0) }
 		
 		self.time = match timestamp {
 			_ if timestamp < 0.0 => 0.0,
@@ -169,7 +185,7 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 		};
 
 		self.update_current_keyframe();
-		self.finished()
+		(self.finished(), timestamp - self.time)
 	}
 
 	/// The length in seconds of this sequence
@@ -194,18 +210,19 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	#[inline]
 	pub fn finished(&self) -> bool { self.time == self.duration() }
 
-	/// Consumes this sequence and creates a new animation sequence which plays in reverse order
-	pub fn reverse(self) -> AnimationSequence<T> {
+	/// Reverses the order of all keyframes in this sequence
+	pub fn reverse(&mut self) {
 		let max_time = self.duration();
+		let mut reversed_vector = Vec::new();
+		
+		for i in (0..self.sequence.len()).rev() {
+			let mut k = self.sequence.remove(i);
+			k.time = max_time - k.time;
+			reversed_vector.push(k);
+		}
 
-		Self::from_iter(self.sequence
-			.into_iter()
-			.rev()
-			.map(|mut k| {
-				k.time = max_time - k.time;
-				k
-			})
-		)
+		self.time = 0.0;
+		self.sequence = reversed_vector;
 	}
 }
 
