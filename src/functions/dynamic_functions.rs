@@ -157,6 +157,7 @@ mod bezier {
 pub use bezier::*;
 
 /// User-defined easing function which wraps a normalized [`AnimationSequence<Float>`](../struct.AnimationSequence.html)
+#[derive(Copy, Clone, Debug)]
 pub struct Keyframes([f64; SAMPLE_TABLE_SIZE]);
 
 impl Keyframes {
