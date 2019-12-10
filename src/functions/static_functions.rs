@@ -44,8 +44,8 @@ impl EasingFunction for EaseInOutQuad {
 /// Accelerating cubically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t * t * t"></div>
-pub struct EaseIn;
-impl EasingFunction for EaseIn {
+pub struct EaseInCubic;
+impl EasingFunction for EaseInCubic {
 	#[inline]
 	fn y(&self, x: f64) -> f64 { x * x * x }
 }
@@ -53,8 +53,8 @@ impl EasingFunction for EaseIn {
 /// Decelerating cubically from point A to point B
 /// 
 /// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
-pub struct EaseOut;
-impl EasingFunction for EaseOut {
+pub struct EaseOutCubic;
+impl EasingFunction for EaseOutCubic {
 	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		let x_minus_one = x - 1.0;
@@ -65,8 +65,8 @@ impl EasingFunction for EaseOut {
 /// Accelerating then decelerating cubically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
-pub struct EaseInOut;
-impl EasingFunction for EaseInOut {
+pub struct EaseInOutCubic;
+impl EasingFunction for EaseInOutCubic {
 	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		if x < 0.5 { 4.0 * x * x * x } 
@@ -152,8 +152,8 @@ impl EasingFunction for EaseInOutQuint {
 /// Accelerating on 1/4 of a sine wave from point A to point B
 /// 
 /// <div class="function-preview" data-function="Math.sin((t - 1) * Math.PI / 2) + 1"></div>
-pub struct EaseInSine;
-impl EasingFunction for EaseInSine {
+pub struct EaseIn;
+impl EasingFunction for EaseIn {
 	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		((x - 1.0) * std::f64::consts::FRAC_PI_2).sin() + 1.0
@@ -163,8 +163,8 @@ impl EasingFunction for EaseInSine {
 /// Decelerating on 1/4 of a sine wave from point A to point B
 /// 
 /// <div class="function-preview" data-function="Math.sin(t * Math.PI / 2)"></div>
-pub struct EaseOutSine;
-impl EasingFunction for EaseOutSine {
+pub struct EaseOut;
+impl EasingFunction for EaseOut {
 	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		(x * std::f64::consts::FRAC_PI_2).sin()
@@ -175,7 +175,7 @@ impl EasingFunction for EaseOutSine {
 /// 
 /// <div class="function-preview" data-function=".5 * (1 - Math.cos(t * Math.PI))"></div>
 pub struct EaseInOutSine;
-impl EasingFunction for EaseInOutSine {
+impl EasingFunction for EaseInOut {
 	#[inline]
 	fn y(&self, x: f64) -> f64 { 
 		0.5 * (1.0 - (x * std::f64::consts::PI).cos())
