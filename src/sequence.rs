@@ -31,14 +31,43 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	}
 
 	fn update_current_keyframe(&mut self) {
-		if let Some(k) = self.keyframe {
-			if self.keyframes() <= k || self.sequence[k].time() > self.time {
-				self.keyframe = None;
-			}
+		// Common cases, reversing/wrapping
+		if self.sequence.len() > 0 && self.time == 0.0 {
+			self.keyframe = Some(0);
+			return;
+		}
+		if self.sequence.len() > 0 && self.time == self.duration() {
+			self.keyframe = Some(self.sequence.len() - 1);
+			return;
 		}
 
-		for i in self.keyframe.unwrap_or(0)..self.keyframes() {
-			if self.sequence[i].time > self.time { break } else { self.keyframe = Some(i) }
+		if let Some(k) = self.keyframe {
+			if self.keyframes() <= k {
+				self.keyframe = None;
+			}
+
+			if self.sequence[k].time() > self.time {
+				for i in (0..self.keyframe.unwrap_or(0)).rev() {
+					if self.sequence[i].time <= self.time { 
+						self.keyframe = Some(i);
+						return;
+					}
+
+					self.keyframe = None;
+				}
+			}
+			else {
+				let copy = self.keyframe;
+				self.keyframe = None;	
+							
+				for i in copy.unwrap_or(0)..self.keyframes() {
+					if self.sequence[i].time > self.time { break } else { self.keyframe = Some(i) }
+				}
+			}
+		}
+		else if self.keyframes() > 0 {
+			self.keyframe = Some(0);
+			self.update_current_keyframe();
 		}
 	}
 
@@ -146,52 +175,61 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	}
 
 	/// Advances this sequence by the duration specified.
-	/// Returns true and the remaining time (i.e. the amount that the specified duration overstepped the total duration of this sequence)
-	/// if this sequence is now finished.
-	pub fn advance_by(&mut self, duration: f64) -> (bool, f64) {
+	/// 
+	/// Returns the remaining time (i.e. the amount that the specified duration went outside the bounds of the total duration of this sequence)
+	/// after the operation has completed. 
+	/// 
+	/// A value over 0 indicates the sequence is at the finish point. 
+	/// A value under 0 indicates this sequence is at the start point. 
+	pub fn advance_by(&mut self, duration: f64) -> f64 {
 		self.advance_to(self.time() + duration)
 	}
 
 	/// Advances this sequence by the duration specified.
-	/// If this sequence becomes finished it will be automatically reversed and `true` is returned. 
+	/// If the duration causes the sequence to go out of bounds it will reverse and return `true`. 
 	pub fn advance_and_maybe_reverse(&mut self, duration: f64) -> bool {
 		match self.advance_by(duration) {
-			(true, extra_time) => {
+			time if time == 0.0 => false,
+			time => {
 				self.reverse();
-				self.advance_and_maybe_reverse(extra_time);
+				if time < 0.0 {
+					self.advance_to(self.duration());
+				}
+				self.advance_and_maybe_reverse(time);
 				
 				true
-			},
-			(false, _) => false
+			}
 		}
 	}
 
 	/// Advances this sequence by the duration specified.
-	/// If this sequence becomes finished it will be automatically restarted and `true` is returned. 
-	pub fn advance_and_maybe_restart(&mut self, duration: f64) -> bool {
+	/// If the duration causes the sequence to go out of bounds it will wrap around and return `true`. 
+	pub fn advance_and_maybe_wrap(&mut self, duration: f64) -> bool {
 		match self.advance_by(duration) {
-			(true, extra_time) => {
-				self.advance_to(0.0);
-				self.advance_and_maybe_restart(extra_time);
+			time if time == 0.0 => false,
+			time => {
+				self.advance_to(if time < 0.0 { self.duration() } else { 0.0 });
+				self.advance_and_maybe_wrap(time);
 				
 				true
-			},
-			(false, _) => false
+			}
 		}
 	}
 
 	/// Advances this sequence to the exact timestamp. 
-	/// Returns true and the remaining time (i.e. the amount that the specified duration overstepped the total duration of this sequence)
-	/// if this sequence is now finished.
+	/// 
+	/// Returns the remaining time (i.e. the amount that the specified timestamp went outside the bounds of the total duration of this sequence)
+	/// after the operation has completed. 
+	/// 
+	/// A value over 0 indicates the sequence is at the finish point. 
+	/// A value under 0 indicates this sequence is at the start point. 
 	/// 
 	/// # Note
 	/// 
 	/// The following applies if:
 	/// * The timestamp is negative: the sequence is set to `0.0`
 	/// * The timestamp is after the duration of the sequence: the sequence is set to `duration()`
-	pub fn advance_to(&mut self, timestamp: f64) -> (bool, f64) {
-		if self.time == timestamp { return (self.finished(), 0.0) }
-		
+	pub fn advance_to(&mut self, timestamp: f64) -> f64 {
 		self.time = match timestamp {
 			_ if timestamp < 0.0 => 0.0,
 			_ if timestamp > self.duration() => self.duration(),
@@ -199,7 +237,7 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 		};
 
 		self.update_current_keyframe();
-		(self.finished(), timestamp - self.time)
+		timestamp - self.time
 	}
 
 	/// The length in seconds of this sequence
@@ -235,8 +273,8 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 			reversed_vector.push(k);
 		}
 
-		self.time = 0.0;
 		self.sequence = reversed_vector;
+		self.advance_to(0.0);
 	}
 }
 
