@@ -12,6 +12,15 @@ impl EasingFunction for Linear {
 	fn y(&self, x: f64) -> f64 { x }
 }
 
+/// Step function, returns the closest to either point A or B
+/// 
+/// <div class="function-preview" data-function="Math.round(t)"></div>
+pub struct Step;
+impl EasingFunction for Step {
+	#[inline]
+	fn y(&self, x: f64) -> f64 { x.round() }
+}
+
 /// Accelerating quadratically from point A to point B
 /// 
 /// <div class="function-preview" data-function="t * t"></div>
