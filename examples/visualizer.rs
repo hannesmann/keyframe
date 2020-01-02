@@ -71,8 +71,8 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 			AnimationSequence::from(keyframes)
 		},
 		VisualizerExample::BezierFourPoint => {
-			// https://easings.net/en#easeInOutBack
-			let bezier = BezierCurve::from([0.68, -0.55].into(), [0.265, 1.55].into());
+			// https://easings.net/en#easeInCirc
+			let bezier = BezierCurve::from([0.6, 0.04].into(), [0.98, 0.335].into());
 
 			keyframes![
 				([0.0, 0.0].into(), 0.0, bezier), 

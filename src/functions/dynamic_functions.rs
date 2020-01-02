@@ -1,5 +1,5 @@
 use crate::*;
-pub(crate) const SAMPLE_TABLE_SIZE: usize = 15;
+pub(crate) const SAMPLE_TABLE_SIZE: usize = 16;
 
 #[cfg(feature = "mint_types")]
 mod bezier {
@@ -18,7 +18,7 @@ mod bezier {
 		p2: Vector2<f32>
 	}
 
-	// All of this is pretty much directly translated from https://github.com/gre/bezier-easing
+	// Directly translated from https://github.com/gre/bezier-easing
 	impl BezierCurve {
 		#[inline]
 		fn a(x1: f32, x2: f32) -> f32 { 1.0 - 3.0 * x2 + 3.0 * x1 }
@@ -41,7 +41,7 @@ mod bezier {
 					break;
 				}
 
-				let current_x = Self::at(guess, x1, 2.0) - x;
+				let current_x = Self::at(guess, x1, x2) - x;
 				guess -= current_x / current_slope;
 			}
 
@@ -56,8 +56,9 @@ mod bezier {
 			let mut current_t = 0.0;
 			let mut i = 0;
 
-			let run_once = false;
-			while run_once || current_x.abs() > SUBDIVISION_PRECISION && (i + 1) < SUBDIVISION_MAX_ITERATIONS {
+			let mut has_run_once = false;
+			while !has_run_once || current_x.abs() > SUBDIVISION_PRECISION && i + 1 < SUBDIVISION_MAX_ITERATIONS {
+				has_run_once = true;
 				current_t = a + (b - a) / 2.0;
 				current_x = Self::at(current_t, x1, x2) - x;
 				
@@ -78,20 +79,21 @@ mod bezier {
 			let mut interval_start = 0.0;
 			let mut current_sample = 1;
 			let last_sample = SAMPLE_TABLE_SIZE - 1;
+			let sample_step_size = 1.0 / (SAMPLE_TABLE_SIZE as f32 - 1.0);
 
 			while current_sample != last_sample && self.sample_table[current_sample] <= x {
-				interval_start += 1.0 / (SAMPLE_TABLE_SIZE as f32 - 1.0);
+				interval_start += sample_step_size;
 				current_sample += 1;
 			}
-
 			current_sample -= 1;
+
 			let dist = (x - self.sample_table[current_sample]) / (self.sample_table[current_sample + 1] - self.sample_table[current_sample]);
-			let guess_for_t = interval_start + dist * SAMPLE_TABLE_SIZE as f32;
+			let guess_for_t = interval_start + dist * sample_step_size;
 
 			match Self::slope(guess_for_t, self.p1.x, self.p2.x) {
 				inital_slope if inital_slope >= NEWTON_MIN_SLOPE => Self::newton_raphson(x, guess_for_t, self.p1.x, self.p2.x),
 				inital_slope if inital_slope == 0.0 => guess_for_t,
-				_ => Self::binary_subdivide(x, interval_start, interval_start + SAMPLE_TABLE_SIZE as f32, self.p1.x, self.p2.x)
+				_ => Self::binary_subdivide(x, interval_start, interval_start + sample_step_size, self.p1.x, self.p2.x)
 			}
 		}
 
@@ -113,7 +115,7 @@ mod bezier {
 			let p2 = Self::convert_vector(p2);
 
 			let mut arr = [0.0; SAMPLE_TABLE_SIZE];
-			for (i, value) in (0..SAMPLE_TABLE_SIZE).enumerate().map(|x| (x.0, Self::at(x.1 as f32 * 1.0 / (SAMPLE_TABLE_SIZE as f32 - 1.0), p1.x, p2.x))) {
+			for (i, value) in (0..SAMPLE_TABLE_SIZE).enumerate().map(|x| (x.0, Self::at(x.1 as f32 * SAMPLE_TABLE_SIZE as f32, p1.x, p2.x))) {
 				arr[i] = value;
 			}
 
