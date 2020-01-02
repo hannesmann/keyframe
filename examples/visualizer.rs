@@ -1,0 +1,201 @@
+#[macro_use]
+extern crate keyframe;
+
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
+
+use ggez::{Context, ContextBuilder, GameResult};
+
+use ggez::conf::{WindowMode, WindowSetup};
+use ggez::event::EventHandler;
+use ggez::graphics::*;
+use ggez::mint::Point2;
+
+use keyframe::{AnimationSequence, functions::*};
+
+fn main() -> GameResult {
+	let (mut ctx, mut event_loop) = ContextBuilder::new("visualizer", "Hannes Mann")
+		.window_mode(WindowMode::default()
+			.dimensions(848.0, 480.0)
+			.min_dimensions(500.0, 340.0)
+			.resizable(true))
+		.window_setup(WindowSetup::default()
+			.title("Sequence Visualizer")
+			.samples(ggez::conf::NumSamples::Four)
+			.vsync(false))
+		.build()?;
+
+	let mut vis = Visualizer {
+		example: VisualizerExample::EaseInOutFourPoint,
+		keyframes: match_sequence(&VisualizerExample::EaseInOutFourPoint),
+		time_in_crate: 0.0
+	};
+	ggez::event::run(&mut ctx, &mut event_loop, &mut vis)
+}
+
+#[derive(Debug, FromPrimitive, Clone, PartialEq)]
+#[repr(i32)]
+enum VisualizerExample {
+	LinearTwoPoint,
+	LinearFourPoint,
+	EaseInOutFourPoint,
+	LinearCircle30Point,
+	BezierFourPoint,
+	Last
+}
+
+fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>> {
+	match example {
+		VisualizerExample::LinearTwoPoint => keyframes![([0.0, 0.0].into(), 0.0, Linear), ([1.0, 1.0].into(), 1.0, Linear)],
+		VisualizerExample::LinearFourPoint => keyframes![
+			([0.0, 0.0].into(), 0.0, Linear), 
+			([0.2, 0.4].into(), 0.3, Linear), 
+			([0.8, 0.4].into(), 0.8, Linear), 
+			([1.0, 1.0].into(), 1.0, Linear)
+		],
+		VisualizerExample::EaseInOutFourPoint => keyframes![
+			([0.0, 0.0].into(), 0.0), 
+			([0.2, 0.4].into(), 0.3), 
+			([0.8, 0.4].into(), 0.8), 
+			([1.0, 1.0].into(), 1.0)
+		],
+		VisualizerExample::LinearCircle30Point => {
+			let mut keyframes = Vec::new();
+
+			for i in 0..=30 {
+				let sin = ((i as f32 / 30.0) * std::f32::consts::PI * 2.0).sin();
+				let cos = ((i as f32 / 30.0) * std::f32::consts::PI * 2.0).cos();
+				keyframes.push(([sin * 0.5 + 0.5, cos * 0.5 + 0.5].into(), i as f64 / 30.0, Linear).into());
+			}
+
+			AnimationSequence::from(keyframes)
+		},
+		VisualizerExample::BezierFourPoint => {
+			// https://easings.net/en#easeInOutBack
+			let bezier = BezierCurve::from([0.68, -0.55].into(), [0.265, 1.55].into());
+
+			keyframes![
+				([0.0, 0.0].into(), 0.0, bezier), 
+				([0.2, 0.4].into(), 0.3, bezier), 
+				([0.8, 0.4].into(), 0.8, bezier), 
+				([1.0, 1.0].into(), 1.0, bezier)
+			]
+		},
+		_ => keyframes![]
+	}
+}
+
+struct Visualizer {
+	example: VisualizerExample,
+	keyframes: AnimationSequence<Point2<f32>>,
+	time_in_crate: f64
+}
+
+impl EventHandler for Visualizer {
+	fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+		self.time_in_crate = 0.0;
+
+		let now = std::time::Instant::now();
+		self.keyframes.advance_and_maybe_reverse(ggez::timer::delta(ctx).as_secs_f64() * 0.5);
+		self.time_in_crate += (std::time::Instant::now() - now).as_secs_f64();
+		
+		Ok(())
+	}
+
+	fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+		let screen_size = drawable_size(ctx);
+		clear(ctx, WHITE);
+
+		let t = Text::new(TextFragment {
+			text: format!("{:?} {:.2}/{:.2} s", self.example, self.keyframes.time() * 2.0, self.keyframes.duration() * 2.0),
+			font: None,
+			scale: Some(Scale::uniform(40.0)),
+			..Default::default()
+		});
+		let size = t.dimensions(ctx);
+		draw(ctx, &t, DrawParam::default()
+			.dest([(screen_size.0 / 2.0 - size.0 as f32 / 2.0).round(), 20.0])
+			.color(BLACK)
+		)?;
+
+		let t = Text::new(TextFragment {
+			text: "Press left or right to switch example".to_owned(),
+			font: None,
+			scale: Some(Scale::uniform(30.0)),
+			..Default::default()
+		});
+		let size = t.dimensions(ctx);
+		draw(ctx, &t, DrawParam::default()
+			.dest([(screen_size.0 / 2.0 - size.0 as f32 / 2.0).round(), screen_size.1 - 60.0])
+			.color(BLACK)
+		)?;
+
+		let area = [100.0, 160.0, screen_size.0 - 100.0 * 2.0, screen_size.1 - 160.0 * 2.0];
+		let now = std::time::Instant::now();
+		let point: Point2<f32> = [area[0] + self.keyframes.now().x * area[2], area[1] + (1.0 - self.keyframes.now().y) * area[3]].into();
+		self.time_in_crate += (std::time::Instant::now() - now).as_secs_f64();
+
+		let circle = Mesh::new_circle(ctx, DrawMode::Fill(FillOptions::DEFAULT), point, 4.0, 2.0, Color::new(0.83, 0.17, 0.12, 1.0))?;
+		draw(ctx, &circle, DrawParam::default())?;
+
+		for k in &self.keyframes {
+			let text = Text::new(TextFragment {
+				text: format!("({:.1}, {:.1}) at {:.1} s", k.value().x, k.value().y, k.time() * 2.0),
+				font: None,
+				scale: Some(Scale::uniform(14.0)),
+				..Default::default()
+			});
+			
+			let p: Point2<f32> = [
+				(area[0] + k.value().x * area[2] - text.dimensions(ctx).0 as f32 / 2.0).round(), 
+				(area[1] + (1.0 - k.value().y) * area[3] - 20.0).round()
+			].into();
+
+			draw(ctx, &text, DrawParam::default()
+				.dest(p)
+				.color(Color::new(0.83, 0.17, 0.12, 1.0))
+			)?;
+		}
+
+		let t = Text::new(TextFragment {
+			text: format!("FPS: {:.1} (ft: {:.2} ms, c: {:.2} ms)", ggez::timer::fps(ctx), ggez::timer::delta(ctx).as_secs_f64() * 1000.0, self.time_in_crate * 1000.0),
+			font: None,
+			scale: Some(Scale::uniform(20.0)),
+			..Default::default()
+		});
+		draw(ctx, &t, DrawParam::default()
+			.dest([10.0, 10.0])
+			.color(Color::new(0.1, 0.9, 0.1, 1.0))
+		)?;
+
+		present(ctx)
+	}
+
+	fn resize_event(&mut self, ctx: &mut Context, width: f32, height: f32) {
+		set_screen_coordinates(ctx, [0.0, 0.0, width, height].into()).expect("Couldn't resize screen");
+	}
+
+	fn key_down_event(&mut self, _ctx: &mut Context, keycode: ggez::input::keyboard::KeyCode, _keymods: ggez::input::keyboard::KeyMods, _repeat: bool) {
+		let now = std::time::Instant::now();
+		let mut example: i32 = unsafe { std::mem::transmute(self.example.clone()) };
+
+		example += match keycode {
+			ggez::input::keyboard::KeyCode::Left => -1,
+			ggez::input::keyboard::KeyCode::Right => 1,
+			_ => 0
+		};
+
+		if example < 0 {
+			example = unsafe { std::mem::transmute::<VisualizerExample, i32>(VisualizerExample::Last) - 1 };
+		}
+		else if example >= unsafe { std::mem::transmute::<VisualizerExample, i32>(VisualizerExample::Last) } {
+			example = 0;
+		}
+
+		if self.example != FromPrimitive::from_i32(example).unwrap_or(VisualizerExample::LinearTwoPoint) {
+			self.example = FromPrimitive::from_i32(example).unwrap_or(VisualizerExample::LinearTwoPoint);
+			self.keyframes = match_sequence(&self.example);
+			self.time_in_crate += (std::time::Instant::now() - now).as_secs_f64();
+		}
+	}
+}

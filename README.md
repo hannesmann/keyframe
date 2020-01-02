@@ -21,6 +21,8 @@ Tweening between two values is done with `keyframe::ease(function, from, to, tim
 
 ## Examples
 
+An example visualizer is included in `examples/`. Run `cargo run --example visualizer --release` to start it. (ggez is really slow in debug mode!)
+
 Tweening:
 
 ```rust
