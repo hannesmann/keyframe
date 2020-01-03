@@ -36,6 +36,23 @@ impl CanTween for f64 {
 	}
 }
 
+impl<T: CanTween> CanTween for Vec<T> {
+	fn ease(from: Self, mut to: Self, time: impl Float) -> Self {
+		if from.len() != to.len() {
+			panic!("Tweening between two vectors can only be done when they are the same size!");
+		}
+
+		for (i, f) in from.into_iter().enumerate() {
+			let mut t = unsafe { std::mem::uninitialized::<T>() }; // TODO: replace with MaybeUninit?
+			std::mem::swap(&mut to[i], &mut t);
+
+			to[i] = CanTween::ease(f, t, time);
+		}
+
+		to
+	}
+}
+
 /// Returns the value at a specified X position on the curve between point A and point B. 
 /// Bounds are 0.0-1.0 for the time argument but it can go out of bounds.
 #[inline]

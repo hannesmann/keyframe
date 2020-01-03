@@ -48,10 +48,7 @@ mod bezier {
 			guess
 		}
 
-		fn binary_subdivide(x: f32, a: f32, b: f32, x1: f32, x2: f32) -> f32 {
-			let mut a = a;
-			let mut b = b;
-
+		fn binary_subdivide(x: f32, mut a: f32, mut b: f32, x1: f32, x2: f32) -> f32 {
 			let mut current_x = 0.0;
 			let mut current_t = 0.0;
 			let mut i = 0;
@@ -147,7 +144,7 @@ pub use bezier::*;
 pub struct Keyframes([f64; SAMPLE_TABLE_SIZE]);
 
 impl Keyframes {
-	pub(crate) fn from_easing_function<T: Float + CanTween + Copy>(s: AnimationSequence<T>) -> Self where Keyframe<T>: Default {
+	pub(crate) fn from_easing_function<T: Float + CanTween + Copy>(mut s: AnimationSequence<T>) -> Self where Keyframe<T>: Default {
 		let mut low_point = s.sequence.get(0).unwrap_or(&Keyframe::default()).value().to_f64().unwrap_or(0.0);
 		let mut high_point = s.sequence.get(s.keyframes() - 1).unwrap_or(&Keyframe::default()).value().to_f64().unwrap_or(1.0);
 		let max_time = s.duration();
@@ -157,7 +154,6 @@ impl Keyframes {
 			high_point = 1.0; // no dividing by zero
 		}
 
-		let mut s = s;
 		let mut sample_table = [0.0; SAMPLE_TABLE_SIZE];
 		for i in 0..SAMPLE_TABLE_SIZE {
 			s.advance_to((i as f64 / (SAMPLE_TABLE_SIZE - 1) as f64) * max_time);
