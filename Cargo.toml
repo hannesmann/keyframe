@@ -1,6 +1,6 @@
 [package]
 name = "keyframe"
-description = "A simple library for smooth animation in Rust"
+description = "A simple library for animation in Rust"
 
 readme = "README.md"
 repository = "https://github.com/HannesMann/keyframe"

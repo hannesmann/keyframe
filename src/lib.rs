@@ -42,9 +42,9 @@
 //!         (1.5, 0.3, EaseIn), // <-- EaseIn used from 0.0 to 0.3
 //!         (2.5, 1.0, Linear) // <-- Linear used from 0.3 to 1.0
 //!     ];
-
+//!
 //!     sequence.advance_by(0.65);
-
+//!
 //!     assert_eq!(sequence.now(), 2.0);
 //!     assert_eq!(sequence.duration(), 1.0);
 //! }
