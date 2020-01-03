@@ -151,14 +151,14 @@ impl<V: CanTween + Copy, T: Float, F: EasingFunction + 'static + Send + Sync> Fr
 impl<T: CanTween + Copy + fmt::Display> fmt::Display for Keyframe<T> {
 	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-		write!(f, "Keyframe at {} s: {}", self.time, self.value)
+		write!(f, "Keyframe at {:.2} s: {}", self.time, self.value)
 	}
 }
 
 impl<T: CanTween + Copy + fmt::Debug> fmt::Debug for Keyframe<T> {
 	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-		write!(f, "Keyframe {{ value: {:?}, time: {:?} }}", self.value, self.time)
+		write!(f, "Keyframe {{ value: {:?}, time: {:.2} }}", self.value, self.time)
 	}
 }
 

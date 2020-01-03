@@ -137,6 +137,18 @@ impl EventHandler for Visualizer {
 		)?;
 
 		let t = Text::new(TextFragment {
+			text: format!("{:?} -> {:?}", self.keyframes.pair().0, self.keyframes.pair().1),
+			font: None,
+			scale: Some(Scale::uniform(15.0)),
+			..Default::default()
+		});
+		let size = t.dimensions(ctx);
+		draw(ctx, &t, DrawParam::default()
+			.dest([(screen_size.0 / 2.0 - size.0 as f32 / 2.0).round(), 60.0])
+			.color(BLACK)
+		)?;
+
+		let t = Text::new(TextFragment {
 			text: "Press left or right to switch example".to_owned(),
 			font: None,
 			scale: Some(Scale::uniform(30.0)),
