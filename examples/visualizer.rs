@@ -84,8 +84,9 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 		},
 		VisualizerExample::KeyframesFunctionFourPoint => {
 			let function = keyframes![
-				(0.0, 0.3, Linear),
-				(0.6, 0.6, Linear),
+				(0.0, 0.0, Linear),
+				(0.4, 0.4, Linear),
+				(0.4, 0.8, Linear),
 				(1.0, 1.0, Linear)
 			].to_easing_function();
 
