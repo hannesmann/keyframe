@@ -17,7 +17,7 @@ A simple library for animation in Rust
 
 Tweening between two values is done with `keyframe::ease(function, from, to, time)`. `from` and `to` can be any type that implements `CanTween`, such as `f64` or `mint::Vector2`, while `time` needs to be a floating-point value between zero and one. `function` specifies the transition between `from` and `to` and is any type that implements `EasingFunction`.
 
-`keyframe::AnimationSequence` can be used to create more complex animations that keeps track of keyframes, time, etc. You can create animation sequences with the `keyframes![...]` macro, from an iterator or from a vector.
+`keyframe::AnimationSequence` can be used to create more complex animations that keep track of keyframes, time, etc. You can create animation sequences with the `keyframes![...]` macro, from an iterator or from a vector.
 
 ## Examples
 

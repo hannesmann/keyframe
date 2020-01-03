@@ -1,3 +1,55 @@
+//! A simple library for animation in Rust
+//!
+//! ## Usage
+//!
+//! Tweening between two values is done with [`ease(function, from, to, time)`](fn.ease.html). 
+//! `from` and `to` can be any type that implements [`CanTween`](trait.CanTween.html), such as `f64` or `mint::Vector2`, while `time` needs to be a floating-point value between zero and one. 
+//! `function` specifies the transition between `from` and `to` and is any type that implements [`EasingFunction`](trait.EasingFunction.html).
+//!
+//! [`AnimationSequence`](struct.AnimationSequence.html) can be used to create more complex animations that keep track of keyframes, time, etc.
+//! You can create animation sequences with the [`keyframes![...]`](macro.keyframes.html) macro, from an iterator or from a vector.
+//! 
+//! ## Examples
+//! 
+//! An example visualizer is included in `examples/`. Run `cargo run --example visualizer --release` to start it. (ggez is really slow in debug mode!)
+//! 
+//! Tweening:
+//! 
+//! ```rust
+//! use keyframe::{ease, functions::*};
+//! 
+//! fn example() -> f64 {
+//!     let a = 0.0;
+//!     let b = 2.0;
+//!     let time = 0.5;
+//! 
+//!     ease(EaseInOut, a, b, time)
+//! }
+//! ```
+//! 
+//! Animation sequences:
+//! 
+//! ```rust 
+//! #[macro_use]
+//! extern crate keyframe;
+//! 
+//! use keyframe::{Keyframe, AnimationSequence};
+//! 
+//! fn example() {
+//!     // (value, time) or (value, time, function)
+//!     let sequence = keyframes![
+//!         (0.5, 0.0), 
+//!         (1.5, 0.3, EaseIn), // <-- EaseIn used from 0.0 to 0.3
+//!         (2.5, 1.0, Linear) // <-- Linear used from 0.3 to 1.0
+//!     ];
+
+//!     sequence.advance_by(0.65);
+
+//!     assert_eq!(sequence.now(), 2.0);
+//!     assert_eq!(sequence.duration(), 1.0);
+//! }
+//! ```
+
 pub(crate) use num_traits::Float;
 #[cfg(feature = "mint_types")]
 pub(crate) use mint::{Vector2, Vector3, Vector4, Point2, Point3};
