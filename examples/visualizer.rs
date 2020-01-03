@@ -80,11 +80,16 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 			]
 		},
 		VisualizerExample::KeyframesFunctionFourPoint => {
+			// The easing function is normalized after creation, this is the same as specifying:
+			// (0.0, 0.0, Linear)
+			// (0.4, 0.4, Linear)
+			// (0.4, 0.8, Linear)
+			// (1.0, 1.0, Linear)
 			let function = keyframes![
-				(0.0, 0.0, Linear),
-				(0.4, 0.4, Linear),
-				(0.4, 0.8, Linear),
-				(1.0, 1.0, Linear)
+				(-0.0, 0.0, Linear),
+				(-0.8, 0.4, Linear),
+				(-0.8, 0.8, Linear),
+				(-2.0, 1.0, Linear)
 			].to_easing_function();
 
 			keyframes![
