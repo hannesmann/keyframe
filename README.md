@@ -47,10 +47,10 @@ use keyframe::{Keyframe, AnimationSequence};
 
 fn example() {
     // (value, time) or (value, time, function)
-    let sequence = keyframes![
+    let mut sequence = keyframes![
          (0.5, 0.0), // <-- EaseInOut used from 0.0 to 0.3
-         (1.5, 0.3, EaseIn), // <-- EaseIn used from 0.3 to 1.0
-         (2.5, 1.0, Linear) // <-- Linear never used, since we're at the end
+         (1.5, 0.3, Linear), // <-- Linear used from 0.3 to 1.0
+         (2.5, 1.0) // <-- Easing function here is never used, since we're at the end
     ];
 
     sequence.advance_by(0.65);
