@@ -9,7 +9,7 @@ version = "1.0.0"
 edition = "2018"
 
 authors = ["Hannes Mann <hannesmann2000@gmail.com>"]
-keywords = ["animation", "keyframes", "transitions", "tweening", "easing", "math", "graphics", "gamedev"]
+keywords = ["animation", "transitions", "easing", "gamedev", "graphics"]
 categories = ["mathematics", "graphics"]
 
 [dependencies]
