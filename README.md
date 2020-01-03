@@ -26,7 +26,7 @@ An example visualizer is included in `examples/`. Run `cargo run --example visua
 Tweening:
 
 ```rust
-use keyframe::{ease, functions::*};
+use keyframe::{ease, functions::EaseInOut};
 
 fn example() -> f64 {
     let a = 0.0;
@@ -40,10 +40,7 @@ fn example() -> f64 {
 Animation sequences:
 
 ```rust 
-#[macro_use]
-extern crate keyframe;
-
-use keyframe::{Keyframe, AnimationSequence};
+use keyframe::{keyframes, Keyframe, AnimationSequence};
 
 fn example() {
     // (value, time) or (value, time, function)

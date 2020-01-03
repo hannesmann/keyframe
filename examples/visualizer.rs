@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate keyframe;
-
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -11,7 +8,7 @@ use ggez::event::EventHandler;
 use ggez::graphics::*;
 use ggez::mint::Point2;
 
-use keyframe::{AnimationSequence, functions::*};
+use keyframe::{keyframes, AnimationSequence, functions::*};
 
 fn main() -> GameResult {
 	let (mut ctx, mut event_loop) = ContextBuilder::new("visualizer", "Hannes Mann")

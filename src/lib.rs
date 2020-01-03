@@ -16,7 +16,7 @@
 //! Tweening:
 //! 
 //! ```rust
-//! use keyframe::{ease, functions::*};
+//! use keyframe::{ease, functions::EaseInOut};
 //! 
 //! fn example() -> f64 {
 //!     let a = 0.0;
@@ -29,11 +29,8 @@
 //! 
 //! Animation sequences:
 //! 
-//! ```rust 
-//! #[macro_use]
-//! extern crate keyframe;
-//! 
-//! use keyframe::{Keyframe, AnimationSequence};
+//! ```rust
+//! use keyframe::{keyframes, Keyframe, AnimationSequence};
 //! 
 //! fn example() {
 //!    // (value, time) or (value, time, function)
@@ -47,7 +44,6 @@
 //!
 //!    assert_eq!(sequence.now(), 2.0);
 //!    assert_eq!(sequence.duration(), 1.0);
-//!
 //! }
 //! ```
 
