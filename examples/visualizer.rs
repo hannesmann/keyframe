@@ -41,6 +41,7 @@ enum VisualizerExample {
 	EaseInOutFourPoint,
 	LinearCircle30Point,
 	BezierFourPoint,
+	KeyframesFunctionFourPoint,
 	Last
 }
 
@@ -79,6 +80,20 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 				([0.2, 0.4].into(), 0.3, bezier), 
 				([0.8, 0.4].into(), 0.8, bezier), 
 				([1.0, 1.0].into(), 1.0, bezier)
+			]
+		},
+		VisualizerExample::KeyframesFunctionFourPoint => {
+			let function = keyframes![
+				(0.0, 0.3, Linear),
+				(0.6, 0.6, Linear),
+				(1.0, 1.0, Linear)
+			].to_easing_function();
+
+			keyframes![
+				([0.0, 0.0].into(), 0.0, function), 
+				([0.2, 0.4].into(), 0.3, function), 
+				([0.8, 0.4].into(), 0.8, function), 
+				([1.0, 1.0].into(), 1.0, function)
 			]
 		},
 		_ => keyframes![]

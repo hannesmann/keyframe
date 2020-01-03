@@ -1,5 +1,5 @@
 use crate::*;
-pub(crate) const SAMPLE_TABLE_SIZE: usize = 16;
+pub(crate) const SAMPLE_TABLE_SIZE: usize = 20;
 
 #[cfg(feature = "mint_types")]
 mod bezier {
@@ -160,7 +160,7 @@ impl Keyframes {
 		let mut s = s;
 		let mut sample_table = [0.0; SAMPLE_TABLE_SIZE];
 		for i in 0..SAMPLE_TABLE_SIZE {
-			s.advance_to((i as f64 / SAMPLE_TABLE_SIZE as f64) * max_time);
+			s.advance_to((i as f64 / (SAMPLE_TABLE_SIZE - 1) as f64) * max_time);
 			sample_table[i] = (s.now().to_f64().unwrap_or(0.5) - low_point) / (high_point - low_point);
 		}
 
@@ -170,13 +170,15 @@ impl Keyframes {
 
 impl EasingFunction for Keyframes {
 	fn y(&self, x: f64) -> f64 { 
-		let current_sample = (x * SAMPLE_TABLE_SIZE as f64).floor() as i64;
-		let difference = x * SAMPLE_TABLE_SIZE as f64 - (x * SAMPLE_TABLE_SIZE as f64).floor();
+		let sample_table_size = SAMPLE_TABLE_SIZE as f64 - 1.0;
+		
+		let current_sample = (x * sample_table_size).floor() as i64;
+		let difference = x * sample_table_size - (x * sample_table_size).floor();
 		let next_sample = current_sample + 1;
 
 		if next_sample >= SAMPLE_TABLE_SIZE as i64 { self.0[current_sample as usize] } 
-		else if current_sample == -1 { self.0[0] * difference }
 		else if current_sample < -1 { -self.0[0] } /* same as self.0[0] * -1 */
+		else if current_sample < 0 { self.0[0] * difference }
 		else { self.0[current_sample as usize] + (self.0[next_sample as usize] - self.0[current_sample as usize]) * difference }
 	}
 }
