@@ -46,6 +46,35 @@
 //!    assert_eq!(sequence.duration(), 1.0);
 //! }
 //! ```
+//! 
+//! Custom structures: 
+//!
+//! ```rust
+//! use keyframe::mint::Point2;
+//! // This macro works with any structure as long as it only consists of types that implement "CanTween"
+//! use keyframe_derive::CanTween;
+//!
+//! #[derive(CanTween)]
+//! struct MySubStructure {
+//!     a: f32
+//! }
+//!
+//! #[derive(CanTween)]
+//! struct MyStructure {
+//!     a: f64,
+//!     b: Point2<f64>,
+//!     c: f32,
+//!     d: Vec<MySubStructure> // BEWARE! This will panic if "from" and "to" are different lengths.
+//! }
+//!
+//! // Also works with unnamed structures
+//! #[derive(CanTween)]
+//! struct UnnamedStructure(MyStructure, f64);
+//! ```
+
+pub use num_traits;
+#[cfg(feature = "mint_types")]
+pub use mint;
 
 pub(crate) use num_traits::Float;
 #[cfg(feature = "mint_types")]

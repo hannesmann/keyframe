@@ -1,0 +1,17 @@
+[package]
+name = "keyframe_derive"
+description = "Implements #[derive(CanTween)] for keyframe"
+
+repository = "https://github.com/HannesMann/keyframe"
+license = "MIT"
+version = "1.0.0"
+edition = "2018"
+
+authors = ["Hannes Mann <hannesmann2000@gmail.com>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0.13"
+quote = "1.0.2"
