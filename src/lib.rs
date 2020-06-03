@@ -30,7 +30,7 @@
 //! Animation sequences:
 //! 
 //! ```rust
-//! use keyframe::{keyframes, Keyframe, AnimationSequence};
+//! use keyframe::{keyframes, Keyframe, AnimationSequence, functions::Linear};
 //! 
 //! fn example() {
 //!    // (value, time) or (value, time, function)
@@ -104,13 +104,13 @@ mod easing;
 pub use easing::*;
 
 /// Intermediate step in an animation sequence
-pub struct Keyframe<T: CanTween + Copy> {
+pub struct Keyframe<T> {
 	value: T,
 	time: f64,
 	function: Box<dyn EasingFunction + Send + Sync>
 }
 
-impl<T: CanTween + Copy> Keyframe<T> {
+impl<T> Keyframe<T> {
 	/// Creates a new keyframe from the specified values.
 	/// If the time value is negative the keyframe will start at 0.0.
 	/// 
@@ -129,7 +129,7 @@ impl<T: CanTween + Copy> Keyframe<T> {
 
 	/// The value of this keyframe
 	#[inline]
-	pub fn value(&self) -> T { self.value }
+	pub fn value(&self) -> T where T: Copy { self.value }
 
 	/// The time in seconds at which this keyframe starts in a sequence
 	#[inline]
@@ -148,7 +148,7 @@ impl<T: CanTween + Copy> Keyframe<T> {
 	/// * The requested time is after the start time of next keyframe: the value of the next keyframe is returned
 	/// * The start time of the next keyframe is before the start time of this keyframe: the value of the next keyframe is returned
 	#[inline]
-	pub fn tween_to(&self, next: &Keyframe<T>, time: impl Float) -> T {
+	pub fn tween_to(&self, next: &Keyframe<T>, time: impl Float) -> T where T: CanTween + Copy {
 		match as_f64(time) {
 			// If the requested time starts before this keyframe
 			time if time < self.time => self.value,
@@ -162,7 +162,7 @@ impl<T: CanTween + Copy> Keyframe<T> {
 	}
 }
 
-impl<V: CanTween + Copy, T: Float> From<(V, T)> for Keyframe<V> {
+impl<V, T: Float> From<(V, T)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time).
 	/// `EaseInOut` will be used as the easing function.
 	/// If the time value is negative the keyframe will start at 0.0.
@@ -170,85 +170,25 @@ impl<V: CanTween + Copy, T: Float> From<(V, T)> for Keyframe<V> {
 	fn from(tuple: (V, T)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), EaseInOut) }
 }
 
-impl<V: CanTween + Copy, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for Keyframe<V> {
+impl<V, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for Keyframe<V> {
 	/// Creates a new keyframe from a tuple of (value, time, function).
 	/// If the time value is negative the keyframe will start at 0.0.
 	#[inline]
 	fn from(tuple: (V, T, F)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), tuple.2) }
 }
 
-impl<T: CanTween + Copy + fmt::Display> fmt::Display for Keyframe<T> {
+impl<T: fmt::Display> fmt::Display for Keyframe<T> {
 	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		write!(f, "Keyframe at {:.2} s: {}", self.time, self.value)
 	}
 }
 
-impl<T: CanTween + Copy + fmt::Debug> fmt::Debug for Keyframe<T> {
+impl<T: fmt::Debug> fmt::Debug for Keyframe<T> {
 	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		write!(f, "Keyframe {{ value: {:?}, time: {:.2} }}", self.value, self.time)
 	}
-}
-
-impl Default for Keyframe<f32> {
-	#[inline]
-	fn default() -> Self { Keyframe::new(0.0, 0.0, Linear) }
-}
-
-impl Default for Keyframe<Vector2<f32>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Vector3<f32>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Vector4<f32>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0, 0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Point2<f32>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Point3<f32>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<f64> {
-	#[inline]
-	fn default() -> Self { Keyframe::new(0.0, 0.0, Linear) }
-}
-
-impl Default for Keyframe<Vector2<f64>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Vector3<f64>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Vector4<f64>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0, 0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Point2<f64>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0].into(), 0.0, Linear) }
-}
-
-impl Default for Keyframe<Point3<f64>> {
-	#[inline]
-	fn default() -> Self { Keyframe::new([0.0, 0.0, 0.0].into(), 0.0, Linear) }
 }
 
 mod sequence;

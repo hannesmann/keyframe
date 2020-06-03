@@ -162,7 +162,8 @@ impl EventHandler for Visualizer {
 
 		let area = [100.0, 160.0, screen_size.0 - 100.0 * 2.0, screen_size.1 - 160.0 * 2.0];
 		let now = std::time::Instant::now();
-		let point: Point2<f32> = [area[0] + self.keyframes.now().x * area[2], area[1] + (1.0 - self.keyframes.now().y) * area[3]].into();
+		let kf_now = self.keyframes.now_strict().unwrap();
+		let point: Point2<f32> = [area[0] + kf_now.x * area[2], area[1] + (1.0 - kf_now.y) * area[3]].into();
 		self.time_in_crate += (std::time::Instant::now() - now).as_secs_f64();
 
 		let circle = Mesh::new_circle(ctx, DrawMode::Fill(FillOptions::DEFAULT), point, 4.0, 2.0, Color::new(0.83, 0.17, 0.12, 1.0))?;

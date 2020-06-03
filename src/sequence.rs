@@ -9,7 +9,8 @@ pub enum AnimationSequenceError {
 }
 
 /// A collection of keyframes that can be played back in sequence
-pub struct AnimationSequence<T: CanTween + Copy> where Keyframe<T>: Default {
+#[derive(Default)]
+pub struct AnimationSequence<T> {
 	pub(crate) sequence: Vec<Keyframe<T>>,
 
 	// Current item we're animating
@@ -18,7 +19,7 @@ pub struct AnimationSequence<T: CanTween + Copy> where Keyframe<T>: Default {
 	time: f64
 } 
 
-impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
+impl<T> AnimationSequence<T> {
 	/// Creates a new empty animation sequence
 	#[inline]
 	pub fn new() -> Self { 	
@@ -87,20 +88,22 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 			Err(AnimationSequenceError::TimeCollision(keyframe.time()))
 		}
 		else {
-			if keyframe.time() > self.sequence.last().unwrap_or(&Keyframe::default()).time() {
-				self.sequence.insert(self.sequence.len(), keyframe);
-			} 
-			else if keyframe.time() < self.sequence.first().unwrap_or(&Keyframe::default()).time() {
-				self.sequence.insert(0, keyframe);
-			}
-			else {
-				self.sequence.push(keyframe);
+			match self.sequence.last() {
+				Some(last) if keyframe.time() > last.time() => {
+					self.sequence.insert(self.sequence.len(), keyframe);
+				}
+				Some(last) if keyframe.time() < last.time() => {
+					self.sequence.insert(0, keyframe);
+				}
+				_ => {
+					self.sequence.push(keyframe);
 
-				// Gives us the following guarantees:
-				// * the item that comes next also has a later time
-				// * the first item has the earliest time
-				// * the last item has the last time (useful for remove_at)
-				self.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+					// Gives us the following guarantees:
+					// * the item that comes next also has a later time
+					// * the first item has the earliest time
+					// * the last item has the last time (useful for remove_at)
+					self.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+				}
 			}
 
 			self.update_current_keyframe();
@@ -164,13 +167,23 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 		}
 	}
 
-	/// The current value of this sequence
-	pub fn now(&self) -> T {
+	/// The current value of this sequence, only based on the existing sequence entries.
+	pub fn now_strict(&self) -> Option<T> where T: CanTween + Copy {
+		match self.pair() {
+			(Some(s1), Some(s2)) => Some(s1.tween_to(s2, self.time)),
+			(Some(s1), None) => Some(s1.value()),
+			(None, Some(s2)) => Some(s2.value()),
+			(None, None) => None,
+		}
+	}
+
+	/// The current value of this sequence, use the default if necessary.
+	pub fn now(&self) -> T where T: CanTween + Copy + Default {
 		match self.pair() {
 			(Some(s1), Some(s2)) => s1.tween_to(s2, self.time),
 			(Some(s1), None) => s1.value(),
-			(None, Some(s2)) => Keyframe::default().tween_to(s2, self.time),
-			(None, None) => Keyframe::default().value()
+			(None, Some(s2)) => Keyframe::new(T::default(), 0.0, Linear).tween_to(s2, self.time),
+			(None, None) => Keyframe::new(T::default(), 0.0, Linear).value(),
 		}
 	}
 
@@ -244,7 +257,7 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	#[inline]
 	pub fn duration(&self) -> f64 { 
 		// Keyframe::default means that if we don't have any items in this collection (meaning - 1 is out of bounds) the maximum time will be 0.0
-		self.sequence.get(self.sequence.len().saturating_sub(1)).unwrap_or(&Keyframe::default()).time 
+		self.sequence.get(self.sequence.len().saturating_sub(1)).map_or(0.0, |kf| kf.time)
 	}
 
 	/// The current progression of this sequence in seconds
@@ -278,7 +291,7 @@ impl<T: CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
 	}
 }
 
-impl<T: Float + CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default {
+impl<T: Float + CanTween + Copy> AnimationSequence<T> {
 	/// Consumes this sequence and creates a normalized easing function which controls the 2D curve according to the keyframes in this sequence
 	/// 
 	/// # Note
@@ -287,7 +300,7 @@ impl<T: Float + CanTween + Copy> AnimationSequence<T> where Keyframe<T>: Default
 	pub fn to_easing_function(self) -> Keyframes { Keyframes::from_easing_function(self) }
 }
 
-impl<T: CanTween + Copy> From<Vec<Keyframe<T>>> for AnimationSequence<T> where Keyframe<T>: Default {
+impl<T> From<Vec<Keyframe<T>>> for AnimationSequence<T> {
 	/// Creates a new animation sequence from a vector of keyframes
 	fn from(vec: Vec<Keyframe<T>>) -> Self {
 		let mut me = AnimationSequence::<T> {
@@ -305,12 +318,7 @@ impl<T: CanTween + Copy> From<Vec<Keyframe<T>>> for AnimationSequence<T> where K
 	}
 }
 
-impl<T: CanTween + Copy> Default for AnimationSequence<T> where Keyframe<T>: Default {
-	#[inline]
-	fn default() -> Self { Self::new() }
-}
-
-impl<T: CanTween + Copy, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> where Keyframe<T>: Default {
+impl<T, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
 	/// Creates a new animation sequence from an iterator
 	fn from_iter<I2: IntoIterator<Item = I>>(iter: I2) -> Self {
 		let mut me = Self::new();
@@ -319,7 +327,7 @@ impl<T: CanTween + Copy, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequ
 	}
 }
 
-impl<'a, T: CanTween + Copy> IntoIterator for &'a AnimationSequence<T> where Keyframe<T>: Default {
+impl<'a, T> IntoIterator for &'a AnimationSequence<T> {
 	type Item = &'a Keyframe<T>;
 	type IntoIter = std::slice::Iter<'a, Keyframe<T>>;
 
@@ -339,7 +347,7 @@ impl<'a, T: CanTween + Copy> IntoIterator for &'a AnimationSequence<T> where Key
 /// ```
 #[macro_export]
 macro_rules! keyframes {
-	() => (AnimationSequence::default());
+	() => (AnimationSequence::new());
 	($($k: expr),*) => {{
 		let mut vec = Vec::new();
 		$( vec.push($k.into()); )*
