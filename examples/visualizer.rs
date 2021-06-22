@@ -11,7 +11,7 @@ use ggez::mint::Point2;
 use keyframe::{keyframes, AnimationSequence, functions::*};
 
 fn main() -> GameResult {
-	let (mut ctx, mut event_loop) = ContextBuilder::new("visualizer", "Hannes Mann")
+	let (ctx, event_loop) = ContextBuilder::new("visualizer", "Hannes Mann")
 		.window_mode(WindowMode::default()
 			.dimensions(848.0, 480.0)
 			.min_dimensions(500.0, 340.0)
@@ -22,12 +22,12 @@ fn main() -> GameResult {
 			.vsync(false))
 		.build()?;
 
-	let mut vis = Visualizer {
+	let vis = Visualizer {
 		example: VisualizerExample::EaseInOutFourPoint,
 		keyframes: match_sequence(&VisualizerExample::EaseInOutFourPoint),
 		time_in_crate: 0.0
 	};
-	ggez::event::run(&mut ctx, &mut event_loop, &mut vis)
+	ggez::event::run(ctx, event_loop, vis)
 }
 
 #[derive(Debug, FromPrimitive, Clone, PartialEq)]
@@ -93,9 +93,9 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 			].to_easing_function();
 
 			keyframes![
-				([0.0, 0.0].into(), 0.0, function), 
-				([0.2, 0.4].into(), 0.3, function), 
-				([0.8, 0.4].into(), 0.8, function), 
+				([0.0, 0.0].into(), 0.0, function),
+				([0.2, 0.4].into(), 0.3, function),
+				([0.8, 0.4].into(), 0.8, function),
 				([1.0, 1.0].into(), 1.0, function)
 			]
 		},
@@ -122,42 +122,42 @@ impl EventHandler for Visualizer {
 
 	fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
 		let screen_size = drawable_size(ctx);
-		clear(ctx, WHITE);
+		clear(ctx, Color::WHITE);
 
 		let t = Text::new(TextFragment {
 			text: format!("{:?} {:.2}/{:.2} s", self.example, self.keyframes.time() * 2.0, self.keyframes.duration() * 2.0),
 			font: None,
-			scale: Some(Scale::uniform(40.0)),
+			scale: Some(PxScale::from(40.0)),
 			..Default::default()
 		});
 		let size = t.dimensions(ctx);
 		draw(ctx, &t, DrawParam::default()
-			.dest([(screen_size.0 / 2.0 - size.0 as f32 / 2.0).round(), 20.0])
-			.color(BLACK)
+			.dest([(screen_size.0 / 2.0 - size.w as f32 / 2.0).round(), 20.0])
+			.color(Color::BLACK)
 		)?;
 
 		let t = Text::new(TextFragment {
 			text: format!("{:?} -> {:?}", self.keyframes.pair().0, self.keyframes.pair().1),
 			font: None,
-			scale: Some(Scale::uniform(15.0)),
+			scale: Some(PxScale::from(15.0)),
 			..Default::default()
 		});
 		let size = t.dimensions(ctx);
 		draw(ctx, &t, DrawParam::default()
-			.dest([(screen_size.0 / 2.0 - size.0 as f32 / 2.0).round(), 60.0])
-			.color(BLACK)
+			.dest([(screen_size.0 / 2.0 - size.w as f32 / 2.0).round(), 60.0])
+			.color(Color::BLACK)
 		)?;
 
 		let t = Text::new(TextFragment {
 			text: "Press left or right to switch example".to_owned(),
 			font: None,
-			scale: Some(Scale::uniform(30.0)),
+			scale: Some(PxScale::from(30.0)),
 			..Default::default()
 		});
 		let size = t.dimensions(ctx);
 		draw(ctx, &t, DrawParam::default()
-			.dest([(screen_size.0 / 2.0 - size.0 as f32 / 2.0).round(), screen_size.1 - 60.0])
-			.color(BLACK)
+			.dest([(screen_size.0 / 2.0 - size.w as f32 / 2.0).round(), screen_size.1 - 60.0])
+			.color(Color::BLACK)
 		)?;
 
 		let area = [100.0, 160.0, screen_size.0 - 100.0 * 2.0, screen_size.1 - 160.0 * 2.0];
@@ -173,12 +173,12 @@ impl EventHandler for Visualizer {
 			let text = Text::new(TextFragment {
 				text: format!("({:.1}, {:.1}) at {:.1} s", k.value().x, k.value().y, k.time() * 2.0),
 				font: None,
-				scale: Some(Scale::uniform(14.0)),
+				scale: Some(PxScale::from(14.0)),
 				..Default::default()
 			});
 			
 			let p: Point2<f32> = [
-				(area[0] + k.value().x * area[2] - text.dimensions(ctx).0 as f32 / 2.0).round(), 
+				(area[0] + k.value().x * area[2] - text.dimensions(ctx).w as f32 / 2.0).round(),
 				(area[1] + (1.0 - k.value().y) * area[3] - 20.0).round()
 			].into();
 
@@ -191,7 +191,7 @@ impl EventHandler for Visualizer {
 		let t = Text::new(TextFragment {
 			text: format!("FPS: {:.1} (ft: {:.2} ms, c: {:.2} ms)", ggez::timer::fps(ctx), ggez::timer::delta(ctx).as_secs_f64() * 1000.0, self.time_in_crate * 1000.0),
 			font: None,
-			scale: Some(Scale::uniform(20.0)),
+			scale: Some(PxScale::from(20.0)),
 			..Default::default()
 		});
 		draw(ctx, &t, DrawParam::default()
