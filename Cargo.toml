@@ -17,7 +17,7 @@ num-traits = "0.2.10"
 mint = { version = "0.5.4", optional = true }
 
 [dev-dependencies]
-ggez = "0.5.1"
+ggez = "0.6.0-rc1"
 num-derive = "0.3.0"
 
 [features]
