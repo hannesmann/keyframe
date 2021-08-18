@@ -19,6 +19,10 @@ pub trait EasingFunction {
 
 /// Type that can be used with an easing function
 pub trait CanTween {
+	/// Returns the interpolated value between `from` and `to` at the specified time.
+	///
+	/// # Note
+	/// This function will always create a new value, so calling it on very large structures is not a good idea.
 	fn ease(from: Self, to: Self, time: impl Float) -> Self;
 }
 
@@ -37,24 +41,26 @@ impl CanTween for f64 {
 }
 
 impl<T: CanTween> CanTween for Vec<T> {
-	fn ease(from: Self, mut to: Self, time: impl Float) -> Self {
-		if from.len() != to.len() {
-			panic!("Tweening between two vectors can only be done when they are the same size!");
+	fn ease(from: Self, to: Self, time: impl Float) -> Self {
+		let mut new_vec = Vec::with_capacity(from.len());
+
+		let from_iterator = from.into_iter();
+		let to_iterator = to.into_iter();
+
+		if from_iterator.len() != to_iterator.len() {
+			panic!("Tweening between two vectors can only be done when they are the same size.");
 		}
 
-		for (i, f) in from.into_iter().enumerate() {
-			let mut t = unsafe { std::mem::uninitialized::<T>() }; // TODO: replace with MaybeUninit?
-			std::mem::swap(&mut to[i], &mut t);
-
-			to[i] = CanTween::ease(f, t, time);
+		for (f, t) in from_iterator.zip(to_iterator) {
+			new_vec.push(T::ease(f, t, time));
 		}
 
-		to
+		new_vec
 	}
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B.
-/// Bounds are 0.0-1.0 for the time argument but it can go out of bounds.
+/// The time argument is expected to stay within a range of 0.0 to 1.0 but bounds checking is not enforced.
 #[inline]
 pub fn ease_with_unbounded_time<V: CanTween, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: impl Float) -> V {
 	V::ease(from, to, function.borrow().y(as_f64(time)))
