@@ -1,7 +1,7 @@
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
-use ggez::{Context, ContextBuilder, GameResult};
+use ggez::{Context, ContextBuilder, GameResult, GameError};
 
 use ggez::conf::{WindowMode, WindowSetup};
 use ggez::event::EventHandler;
@@ -109,7 +109,7 @@ struct Visualizer {
 	time_in_crate: f64
 }
 
-impl EventHandler for Visualizer {
+impl EventHandler<GameError> for Visualizer {
 	fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
 		self.time_in_crate = 0.0;
 

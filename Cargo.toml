@@ -14,11 +14,11 @@ categories = ["mathematics", "graphics"]
 
 [dependencies]
 num-traits = "0.2.10"
-mint = { version = "0.5.4", optional = true }
+mint = { version = "0.5.6", optional = true }
 
 [dev-dependencies]
-ggez = "0.6.0-rc1"
-num-derive = "0.3.0"
+ggez = "0.6.0"
+num-derive = "0.3.3"
 
 [features]
 default = ["mint_types"]
