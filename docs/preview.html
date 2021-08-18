@@ -91,7 +91,7 @@
 			ctx.beginPath();
 			ctx.strokeStyle = "#d62d20";
 			ctx.lineWidth = 2 * devicePixelRatio;
-			
+
 			ctx.moveTo(bounds[0], bounds[3]);
 			for(var x = 0; x <= 250; x += 10)
 				ctx.lineTo(bounds[0] + (x * devicePixelRatio), bounds[3] - (easingFunction(x / 250.0) * 100.0) * devicePixelRatio);
@@ -133,7 +133,7 @@
 
 	}
 
-	document.addEventListener("DOMContentLoaded", drawOrRedrawPreviews);	
+	document.addEventListener("DOMContentLoaded", drawOrRedrawPreviews);
 	window.addEventListener("resize", function() {
 		if(devicePixelRatio != lastScaleFactor) {
 			drawOrRedrawPreviews();

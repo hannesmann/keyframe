@@ -13,7 +13,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
 	let struct_name = &input.ident;
 	let generics = &input.generics;
 	let where_clause = &input.generics.where_clause;
-	
+
 	match &input.data {
 		Data::Struct(DataStruct { fields: Fields::Named(fields), .. }) => {
 			let field_name = fields.named.iter().map(|field| &field.ident);

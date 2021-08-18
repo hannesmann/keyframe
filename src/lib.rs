@@ -2,36 +2,36 @@
 //!
 //! ## Usage
 //!
-//! Tweening between two values is done with [`ease(function, from, to, time)`](fn.ease.html). 
-//! `from` and `to` can be any type that implements [`CanTween`](trait.CanTween.html), such as `f64` or `mint::Vector2`, while `time` needs to be a floating-point value between zero and one. 
+//! Tweening between two values is done with [`ease(function, from, to, time)`](fn.ease.html).
+//! `from` and `to` can be any type that implements [`CanTween`](trait.CanTween.html), such as `f64` or `mint::Vector2`, while `time` needs to be a floating-point value between zero and one.
 //! `function` specifies the transition between `from` and `to` and is any type that implements [`EasingFunction`](trait.EasingFunction.html).
 //!
 //! [`AnimationSequence`](struct.AnimationSequence.html) can be used to create more complex animations that keep track of keyframes, time, etc.
 //! You can create animation sequences with the [`keyframes![...]`](macro.keyframes.html) macro, from an iterator or from a vector.
-//! 
+//!
 //! ## Examples
-//! 
+//!
 //! An example visualizer is included in `examples/`. Run `cargo run --example visualizer --release` to start it. (ggez is really slow in debug mode!)
-//! 
+//!
 //! Tweening:
-//! 
+//!
 //! ```rust
 //! use keyframe::{ease, functions::EaseInOut};
-//! 
+//!
 //! fn example() -> f64 {
 //!     let a = 0.0;
 //!     let b = 2.0;
 //!     let time = 0.5;
-//! 
+//!
 //!     ease(EaseInOut, a, b, time)
 //! }
 //! ```
-//! 
+//!
 //! Animation sequences:
-//! 
+//!
 //! ```rust
 //! use keyframe::{keyframes, Keyframe, AnimationSequence, functions::Linear};
-//! 
+//!
 //! fn example() {
 //!    // (value, time) or (value, time, function)
 //!    let mut sequence = keyframes![
@@ -46,8 +46,8 @@
 //!    assert_eq!(sequence.duration(), 1.0);
 //! }
 //! ```
-//! 
-//! Custom structures: 
+//!
+//! Custom structures:
 //!
 //! ```rust
 //! use keyframe::mint::Point2;
@@ -83,16 +83,16 @@ pub(crate) use mint::{Vector2, Vector3, Vector4, Point2, Point3};
 use std::fmt;
 
 pub(crate) fn as_f64(value: impl Float) -> f64 { value.to_f64().expect(&format!("Value not representable in f64")) }
-pub(crate) fn as_t<T: Float>(value: f64) -> T { 
+pub(crate) fn as_t<T: Float>(value: f64) -> T {
 	match value {
 		_ if value > as_f64(T::max_value()) => T::max_value(),
 		_ if value < as_f64(T::min_value()) => T::min_value(),
-		_ => T::from(value).expect(&format!("{} not representable in chosen float type", value)) 
+		_ => T::from(value).expect(&format!("{} not representable in chosen float type", value))
 	}
 }
 
 /// Definitions for various easing functions
-/// 
+///
 /// <div class="function-preview" data-function="t" data-struct="Linear"></div>
 /// <div class="function-preview" data-function="t * t * t" data-struct="EaseIn"></div>
 /// <div class="function-preview" data-function="(--t) * t * t + 1" data-struct="EaseOut"></div>
@@ -113,7 +113,7 @@ pub struct Keyframe<T> {
 impl<T> Keyframe<T> {
 	/// Creates a new keyframe from the specified values.
 	/// If the time value is negative the keyframe will start at 0.0.
-	/// 
+	///
 	/// # Arguments
 	/// * `value` - The value that this keyframe will be tweened to/from
 	/// * `time` - The start time in seconds of this keyframe
@@ -140,9 +140,9 @@ impl<T> Keyframe<T> {
 	pub fn function(&self) -> &dyn EasingFunction { self.function.as_ref() }
 
 	/// Returns the value between this keyframe and the next keyframe at the specified time
-	/// 
+	///
 	/// # Note
-	/// 
+	///
 	/// The following applies if:
 	/// * The requested time is before the start time of this keyframe: the value of this keyframe is returned
 	/// * The requested time is after the start time of next keyframe: the value of the next keyframe is returned

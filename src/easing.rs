@@ -4,15 +4,15 @@ use std::borrow::Borrow;
 
 /// Implementation of a 2D curve function for easing between two points
 pub trait EasingFunction {
-	/// For an X position on the curve, calculate the Y position. 
-	/// 0.0-1.0 is start and end on both axes but values can go out of bounds. 
-	/// 
+	/// For an X position on the curve, calculate the Y position.
+	/// 0.0-1.0 is start and end on both axes but values can go out of bounds.
+	///
 	/// # Note
-	/// 
-	/// Because this method has a `&self` argument this trait can be used to both implement a "static" curve function (e.g. a linear interpolation) 
+	///
+	/// Because this method has a `&self` argument this trait can be used to both implement a "static" curve function (e.g. a linear interpolation)
 	/// or a "dynamic" curve function (e.g. a bezier curve with user defined inputs).
-	/// 
-	/// Since a static curve function will have zero size the size of a `dyn EasingFunction` will be the same size as a vtable. 
+	///
+	/// Since a static curve function will have zero size the size of a `dyn EasingFunction` will be the same size as a vtable.
 	/// This also means you can specify a static curve function with only the name of the type (e.g. `ease(EaseInOut, 0.0, 1.0, 0.5)`).
 	fn y(&self, x: f64) -> f64;
 }
@@ -32,7 +32,7 @@ impl CanTween for f32 {
 impl CanTween for f64 {
 	#[inline]
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
-		as_t(as_f64(from) + as_f64(to - from) * as_f64(time))	
+		as_t(as_f64(from) + as_f64(to - from) * as_f64(time))
 	}
 }
 
@@ -53,14 +53,14 @@ impl<T: CanTween> CanTween for Vec<T> {
 	}
 }
 
-/// Returns the value at a specified X position on the curve between point A and point B. 
+/// Returns the value at a specified X position on the curve between point A and point B.
 /// Bounds are 0.0-1.0 for the time argument but it can go out of bounds.
 #[inline]
 pub fn ease_with_unbounded_time<V: CanTween, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: impl Float) -> V {
 	V::ease(from, to, function.borrow().y(as_f64(time)))
 }
 
-/// Returns the value at a specified X position on the curve between point A and point B. 
+/// Returns the value at a specified X position on the curve between point A and point B.
 /// Time is limited to a range between 0.0 and 1.0.
 #[inline]
 pub fn ease<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: T) -> V {
@@ -71,7 +71,7 @@ pub fn ease<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, 
 	})
 }
 
-/// Returns the value at a specified X position on the curve between point A and point B. 
+/// Returns the value at a specified X position on the curve between point A and point B.
 /// Time is limited to a range between 0.0 and `max_time`.
 #[inline]
 pub fn ease_with_scaled_time<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: T, max_time: T) -> V {

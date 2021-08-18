@@ -39,7 +39,7 @@ fn example() -> f64 {
 
 Animation sequences:
 
-```rust 
+```rust
 use keyframe::{keyframes, Keyframe, AnimationSequence};
 
 fn example() {
@@ -57,7 +57,7 @@ fn example() {
 }
 ```
 
-Custom structures: 
+Custom structures:
 
 ```rust
 use keyframe::mint::Point2;

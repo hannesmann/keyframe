@@ -46,15 +46,15 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 	match example {
 		VisualizerExample::LinearTwoPoint => keyframes![([0.0, 0.0].into(), 0.0, Linear), ([1.0, 1.0].into(), 1.0, Linear)],
 		VisualizerExample::LinearFourPoint => keyframes![
-			([0.0, 0.0].into(), 0.0, Linear), 
-			([0.2, 0.4].into(), 0.3, Linear), 
-			([0.8, 0.4].into(), 0.8, Linear), 
+			([0.0, 0.0].into(), 0.0, Linear),
+			([0.2, 0.4].into(), 0.3, Linear),
+			([0.8, 0.4].into(), 0.8, Linear),
 			([1.0, 1.0].into(), 1.0, Linear)
 		],
 		VisualizerExample::EaseInOutFourPoint => keyframes![
-			([0.0, 0.0].into(), 0.0), 
-			([0.2, 0.4].into(), 0.3), 
-			([0.8, 0.4].into(), 0.8), 
+			([0.0, 0.0].into(), 0.0),
+			([0.2, 0.4].into(), 0.3),
+			([0.8, 0.4].into(), 0.8),
 			([1.0, 1.0].into(), 1.0)
 		],
 		VisualizerExample::LinearCircle30Point => {
@@ -73,9 +73,9 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 			let bezier = BezierCurve::from([0.6, 0.04].into(), [0.98, 0.335].into());
 
 			keyframes![
-				([0.0, 0.0].into(), 0.0, bezier), 
-				([0.2, 0.4].into(), 0.3, bezier), 
-				([0.8, 0.4].into(), 0.8, bezier), 
+				([0.0, 0.0].into(), 0.0, bezier),
+				([0.2, 0.4].into(), 0.3, bezier),
+				([0.8, 0.4].into(), 0.8, bezier),
 				([1.0, 1.0].into(), 1.0, bezier)
 			]
 		},
@@ -116,7 +116,7 @@ impl EventHandler for Visualizer {
 		let now = std::time::Instant::now();
 		self.keyframes.advance_and_maybe_reverse(ggez::timer::delta(ctx).as_secs_f64() * 0.5);
 		self.time_in_crate += (std::time::Instant::now() - now).as_secs_f64();
-		
+
 		Ok(())
 	}
 
@@ -176,7 +176,7 @@ impl EventHandler for Visualizer {
 				scale: Some(PxScale::from(14.0)),
 				..Default::default()
 			});
-			
+
 			let p: Point2<f32> = [
 				(area[0] + k.value().x * area[2] - text.dimensions(ctx).w as f32 / 2.0).round(),
 				(area[1] + (1.0 - k.value().y) * area[3] - 20.0).round()

@@ -17,12 +17,12 @@ pub struct AnimationSequence<T> {
 	keyframe: Option<usize>,
 	// Current time
 	time: f64
-} 
+}
 
 impl<T> AnimationSequence<T> {
 	/// Creates a new empty animation sequence
 	#[inline]
-	pub fn new() -> Self { 	
+	pub fn new() -> Self {
 		AnimationSequence::<T> {
 			sequence: Vec::new(),
 			keyframe: None,
@@ -49,7 +49,7 @@ impl<T> AnimationSequence<T> {
 
 			if self.sequence[k].time() > self.time {
 				for i in (0..self.keyframe.unwrap_or(0)).rev() {
-					if self.sequence[i].time <= self.time { 
+					if self.sequence[i].time <= self.time {
 						self.keyframe = Some(i);
 						return;
 					}
@@ -59,8 +59,8 @@ impl<T> AnimationSequence<T> {
 			}
 			else {
 				let copy = self.keyframe;
-				self.keyframe = None;	
-							
+				self.keyframe = None;
+
 				for i in copy.unwrap_or(0)..self.keyframes() {
 					if self.sequence[i].time > self.time { break } else { self.keyframe = Some(i) }
 				}
@@ -73,7 +73,7 @@ impl<T> AnimationSequence<T> {
 	}
 
 	fn insert_into_vec(&mut self, keyframe: Keyframe<T>) -> Result<(), AnimationSequenceError> {
-		if self.has_keyframe_at(keyframe.time()) { 
+		if self.has_keyframe_at(keyframe.time()) {
 			Err(AnimationSequenceError::TimeCollision(keyframe.time()))
 		}
 		else {
@@ -84,7 +84,7 @@ impl<T> AnimationSequence<T> {
 
 	/// Inserts a new keyframe into the animation sequence
 	pub fn insert(&mut self, keyframe: Keyframe<T>) -> Result<(), AnimationSequenceError> {
-		if self.has_keyframe_at(keyframe.time()) { 
+		if self.has_keyframe_at(keyframe.time()) {
 			Err(AnimationSequenceError::TimeCollision(keyframe.time()))
 		}
 		else {
@@ -111,14 +111,14 @@ impl<T> AnimationSequence<T> {
 		}
 	}
 
-	/// Inserts several keyframes from an iterator all at once. 
+	/// Inserts several keyframes from an iterator all at once.
 	/// This is faster because sorting only needs to be done after all the keyframes have been inserted.
 	pub fn insert_many(&mut self, keyframes: impl IntoIterator<Item = impl Into<Keyframe<T>>>) -> Result<(), AnimationSequenceError> {
 		for k in keyframes { self.insert_into_vec(k.into())?; }
 		self.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
 		self.update_current_keyframe();
 		Ok(())
-	}	
+	}
 
 	/// Removes the keyframe from the sequence at the specified time. Returns true if a keyframe was actually removed
 	pub fn remove(&mut self, timestamp: f64) -> bool { self.retain(|t| t != timestamp) }
@@ -150,9 +150,9 @@ impl<T> AnimationSequence<T> {
 	pub fn keyframes(&self) -> usize { self.sequence.len() }
 
 	/// The current pair of keyframes that are being animated (current, next)
-	/// 
+	///
 	/// # Note
-	/// 
+	///
 	/// The following applies if:
 	/// * There are no keyframes in this sequence: (`None`, `None`) is returned
 	/// * The sequence has not reached the first keyframe: (`None`, current) is returned
@@ -160,7 +160,7 @@ impl<T> AnimationSequence<T> {
 	/// * The sequence has finished: (current, `None`) is returned
 	pub fn pair(&self) -> (Option<&Keyframe<T>>, Option<&Keyframe<T>>) {
 		match self.keyframe {
-			Some(c) if c == self.sequence.len() - 1 => (Some(&self.sequence[c]), None), 
+			Some(c) if c == self.sequence.len() - 1 => (Some(&self.sequence[c]), None),
 			Some(c) => (Some(&self.sequence[c]), Some(&self.sequence[c + 1])),
 			None if self.sequence.len() > 0 => (None, Some(&self.sequence[0])),
 			None => (None, None)
@@ -188,18 +188,18 @@ impl<T> AnimationSequence<T> {
 	}
 
 	/// Advances this sequence by the duration specified.
-	/// 
+	///
 	/// Returns the remaining time (i.e. the amount that the specified duration went outside the bounds of the total duration of this sequence)
-	/// after the operation has completed. 
-	/// 
-	/// A value over 0 indicates the sequence is at the finish point. 
-	/// A value under 0 indicates this sequence is at the start point. 
+	/// after the operation has completed.
+	///
+	/// A value over 0 indicates the sequence is at the finish point.
+	/// A value under 0 indicates this sequence is at the start point.
 	pub fn advance_by(&mut self, duration: f64) -> f64 {
 		self.advance_to(self.time() + duration)
 	}
 
 	/// Advances this sequence by the duration specified.
-	/// If the duration causes the sequence to go out of bounds it will reverse and return `true`. 
+	/// If the duration causes the sequence to go out of bounds it will reverse and return `true`.
 	pub fn advance_and_maybe_reverse(&mut self, duration: f64) -> bool {
 		match self.advance_by(duration) {
 			time if time == 0.0 => false,
@@ -209,36 +209,36 @@ impl<T> AnimationSequence<T> {
 					self.advance_to(self.duration());
 				}
 				self.advance_and_maybe_reverse(time);
-				
+
 				true
 			}
 		}
 	}
 
 	/// Advances this sequence by the duration specified.
-	/// If the duration causes the sequence to go out of bounds it will wrap around and return `true`. 
+	/// If the duration causes the sequence to go out of bounds it will wrap around and return `true`.
 	pub fn advance_and_maybe_wrap(&mut self, duration: f64) -> bool {
 		match self.advance_by(duration) {
 			time if time == 0.0 => false,
 			time => {
 				self.advance_to(if time < 0.0 { self.duration() } else { 0.0 });
 				self.advance_and_maybe_wrap(time);
-				
+
 				true
 			}
 		}
 	}
 
-	/// Advances this sequence to the exact timestamp. 
-	/// 
+	/// Advances this sequence to the exact timestamp.
+	///
 	/// Returns the remaining time (i.e. the amount that the specified timestamp went outside the bounds of the total duration of this sequence)
-	/// after the operation has completed. 
-	/// 
-	/// A value over 0 indicates the sequence is at the finish point. 
-	/// A value under 0 indicates this sequence is at the start point. 
-	/// 
+	/// after the operation has completed.
+	///
+	/// A value over 0 indicates the sequence is at the finish point.
+	/// A value under 0 indicates this sequence is at the start point.
+	///
 	/// # Note
-	/// 
+	///
 	/// The following applies if:
 	/// * The timestamp is negative: the sequence is set to `0.0`
 	/// * The timestamp is after the duration of the sequence: the sequence is set to `duration()`
@@ -255,7 +255,7 @@ impl<T> AnimationSequence<T> {
 
 	/// The length in seconds of this sequence
 	#[inline]
-	pub fn duration(&self) -> f64 { 
+	pub fn duration(&self) -> f64 {
 		// Keyframe::default means that if we don't have any items in this collection (meaning - 1 is out of bounds) the maximum time will be 0.0
 		self.sequence.get(self.sequence.len().saturating_sub(1)).map_or(0.0, |kf| kf.time)
 	}
@@ -266,11 +266,11 @@ impl<T> AnimationSequence<T> {
 
 	/// The current progression of this sequence as a percentage
 	#[inline]
-	pub fn progress(&self) -> f64 { 
+	pub fn progress(&self) -> f64 {
 		if self.duration() == 0.0 { 0.0 } else { self.time / self.duration() }
 	}
 
-	/// If this sequence has finished and is at the end. 
+	/// If this sequence has finished and is at the end.
 	/// It can be reset with `advance_to(0.0)`.
 	#[inline]
 	pub fn finished(&self) -> bool { self.time == self.duration() }
@@ -293,9 +293,9 @@ impl<T> AnimationSequence<T> {
 
 impl<T: Float + CanTween + Copy> AnimationSequence<T> {
 	/// Consumes this sequence and creates a normalized easing function which controls the 2D curve according to the keyframes in this sequence
-	/// 
+	///
 	/// # Note
-	/// 
+	///
 	/// This function is only implemented for one-dimensional float types, since each value corresponds to a Y position
 	pub fn to_easing_function(self) -> Keyframes { Keyframes::from_easing_function(self) }
 }
@@ -338,10 +338,10 @@ impl<'a, T> IntoIterator for &'a AnimationSequence<T> {
 }
 
 /// Creates an animation sequence containing any arguments that can be made into keyframes
-/// 
+///
 /// # Note
-/// 
-/// While this macro can be used with [`Keyframe::new`](struct.Keyframe.html#method.new) it's recommended to specify your keyframes with tuples (for shorter code) like this: 
+///
+/// While this macro can be used with [`Keyframe::new`](struct.Keyframe.html#method.new) it's recommended to specify your keyframes with tuples (for shorter code) like this:
 /// ```ignore
 /// keyframes![(0.0, 0.0), (0.5, 1.0), (1.0, 2.0), (1.5, 3.0, EaseOut), (2.0, 4.0)]
 /// ```

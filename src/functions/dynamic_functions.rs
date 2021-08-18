@@ -58,7 +58,7 @@ mod bezier {
 				has_run_once = true;
 				current_t = a + (b - a) / 2.0;
 				current_x = Self::at(current_t, x1, x2) - x;
-				
+
 				if current_x > 0.0 {
 					b = current_t;
 				}
@@ -95,17 +95,17 @@ mod bezier {
 		}
 
 		fn convert_vector(c: Vector2<impl Float>) -> Vector2<f32> {
-			Vector2::<f32> { 
+			Vector2::<f32> {
 				x: as_t::<f32>(as_f64(c.x)),
 				y: as_t::<f32>(as_f64(c.y))
 			}
 		}
 
 		/// Calculates a new cubic Bézier curve. Mimics `transition-timing-function: cubic-bezier` as defined [here](https://www.w3.org/TR/css-easing-1/#cubic-bezier-easing-functions)
-		/// 
+		///
 		/// # Arguments
-		/// 
-		/// * `p1` - The first of the two control points 
+		///
+		/// * `p1` - The first of the two control points
 		/// * `p2` - The second of the two control points
 		pub fn from(p1: Vector2<impl Float>, p2: Vector2<impl Float>) -> Self {
 			let p1 = Self::convert_vector(p1);
@@ -126,7 +126,7 @@ mod bezier {
 
 	impl EasingFunction for BezierCurve {
 		#[inline]
-		fn y(&self, x: f64) -> f64 { 
+		fn y(&self, x: f64) -> f64 {
 			match x {
 				_ if x == 0.0 => 0.0,
 				_ if x == 1.0 => 1.0,
@@ -165,14 +165,14 @@ impl Keyframes {
 }
 
 impl EasingFunction for Keyframes {
-	fn y(&self, x: f64) -> f64 { 
+	fn y(&self, x: f64) -> f64 {
 		let sample_table_size = SAMPLE_TABLE_SIZE as f64 - 1.0;
-		
+
 		let current_sample = (x * sample_table_size).floor() as i64;
 		let difference = x * sample_table_size - (x * sample_table_size).floor();
 		let next_sample = current_sample + 1;
 
-		if next_sample >= SAMPLE_TABLE_SIZE as i64 { self.0[current_sample as usize] } 
+		if next_sample >= SAMPLE_TABLE_SIZE as i64 { self.0[current_sample as usize] }
 		else if current_sample < -1 { -self.0[0] } /* same as self.0[0] * -1 */
 		else if current_sample < 0 { self.0[0] * difference }
 		else { self.0[current_sample as usize] + (self.0[next_sample as usize] - self.0[current_sample as usize]) * difference }
