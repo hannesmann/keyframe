@@ -127,6 +127,21 @@ impl<T> Keyframe<T> {
 		}
 	}
 
+	/// Same as [`new`](#method.new), but allows you to supply an easing function which size is not known at compile time.
+	///
+	/// # Arguments
+	/// * `value` - The value that this keyframe will be tweened to/from
+	/// * `time` - The start time in seconds of this keyframe
+	/// * `function` - The easing function to use from the start of this keyframe to the start of the next keyframe
+	#[inline]
+	pub fn new_dynamic<F: Float>(value: T, time: F, function: Box<dyn EasingFunction + 'static + Send + Sync>) -> Self {
+		Keyframe::<T> {
+			value: value,
+			time: if time < F::zero() { 0.0 } else { as_f64(time) },
+			function
+		}
+	}
+
 	/// The value of this keyframe
 	#[inline]
 	pub fn value(&self) -> T where T: Copy { self.value }
@@ -175,6 +190,13 @@ impl<V, T: Float, F: EasingFunction + 'static + Send + Sync> From<(V, T, F)> for
 	/// If the time value is negative the keyframe will start at 0.0.
 	#[inline]
 	fn from(tuple: (V, T, F)) -> Self { Keyframe::new(tuple.0, as_f64(tuple.1), tuple.2) }
+}
+
+impl<V, T: Float> From<(V, T, Box<dyn EasingFunction + 'static + Send + Sync>)> for Keyframe<V> {
+	/// Creates a new keyframe from a tuple of (value, time, function).
+	/// If the time value is negative the keyframe will start at 0.0.
+	#[inline]
+	fn from(tuple: (V, T, Box<dyn EasingFunction + 'static + Send + Sync>)) -> Self { Keyframe::new_dynamic(tuple.0, as_f64(tuple.1), tuple.2) }
 }
 
 impl<T: fmt::Display> fmt::Display for Keyframe<T> {
