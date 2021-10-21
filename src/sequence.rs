@@ -3,6 +3,7 @@ use crate::*;
 use std::iter::FromIterator;
 
 /// Category of animation sequence error
+#[derive(Debug)]
 pub enum AnimationSequenceError {
 	/// An attempt was made to insert a keyframe into the sequence when another keyframe already exists with the same start time
 	TimeCollision(f64)
