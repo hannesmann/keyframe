@@ -71,6 +71,7 @@
 //! #[derive(CanTween)]
 //! struct UnnamedStructure(MyStructure, f64);
 //! ```
+#![no_std]
 
 pub use num_traits;
 #[cfg(feature = "mint_types")]
