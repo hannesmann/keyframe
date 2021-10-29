@@ -1,6 +1,9 @@
+use core::borrow::Borrow;
+
 pub(crate) use crate::*;
 
-use std::borrow::Borrow;
+#[cfg(feature = "mint_types")]
+pub use mint_type_impls::*;
 
 /// Implementation of a 2D curve function for easing between two points
 pub trait EasingFunction {
