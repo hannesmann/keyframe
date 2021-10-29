@@ -1,12 +1,17 @@
-use crate::*;
+use alloc::vec::Vec;
+use core::iter::FromIterator;
+use num_traits::Float;
 
-use std::iter::FromIterator;
+use crate::{
+	easing::{Keyframes, Linear},
+	CanTween, Keyframe,
+};
 
 /// Category of animation sequence error
 #[derive(Debug)]
 pub enum AnimationSequenceError {
 	/// An attempt was made to insert a keyframe into the sequence when another keyframe already exists with the same start time
-	TimeCollision(f64)
+	TimeCollision(f64),
 }
 
 /// A collection of keyframes that can be played back in sequence
@@ -17,7 +22,7 @@ pub struct AnimationSequence<T> {
 	// Current item we're animating
 	keyframe: Option<usize>,
 	// Current time
-	time: f64
+	time: f64,
 }
 
 impl<T> AnimationSequence<T> {
@@ -28,7 +33,7 @@ impl<T> AnimationSequence<T> {
 			sequence: Vec::new(),
 			keyframe: None,
 
-			time: 0.0
+			time: 0.0,
 		}
 	}
 
@@ -57,17 +62,19 @@ impl<T> AnimationSequence<T> {
 
 					self.keyframe = None;
 				}
-			}
-			else {
+			} else {
 				let copy = self.keyframe;
 				self.keyframe = None;
 
 				for i in copy.unwrap_or(0)..self.keyframes() {
-					if self.sequence[i].time > self.time { break } else { self.keyframe = Some(i) }
+					if self.sequence[i].time > self.time {
+						break;
+					} else {
+						self.keyframe = Some(i)
+					}
 				}
 			}
-		}
-		else if self.keyframes() > 0 {
+		} else if self.keyframes() > 0 {
 			self.keyframe = Some(0);
 			self.update_current_keyframe();
 		}
@@ -76,8 +83,7 @@ impl<T> AnimationSequence<T> {
 	fn insert_into_vec(&mut self, keyframe: Keyframe<T>) -> Result<(), AnimationSequenceError> {
 		if self.has_keyframe_at(keyframe.time()) {
 			Err(AnimationSequenceError::TimeCollision(keyframe.time()))
-		}
-		else {
+		} else {
 			self.sequence.push(keyframe);
 			Ok(())
 		}
@@ -87,8 +93,7 @@ impl<T> AnimationSequence<T> {
 	pub fn insert(&mut self, keyframe: Keyframe<T>) -> Result<(), AnimationSequenceError> {
 		if self.has_keyframe_at(keyframe.time()) {
 			Err(AnimationSequenceError::TimeCollision(keyframe.time()))
-		}
-		else {
+		} else {
 			match self.sequence.last() {
 				Some(last) if keyframe.time() > last.time() => {
 					self.sequence.insert(self.sequence.len(), keyframe);
@@ -103,7 +108,11 @@ impl<T> AnimationSequence<T> {
 					// * the item that comes next also has a later time
 					// * the first item has the earliest time
 					// * the last item has the last time (useful for remove_at)
-					self.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+					self.sequence.sort_unstable_by(|k, k2| {
+						k.time
+							.partial_cmp(&k2.time)
+							.unwrap_or(core::cmp::Ordering::Equal)
+					});
 				}
 			}
 
@@ -114,17 +123,30 @@ impl<T> AnimationSequence<T> {
 
 	/// Inserts several keyframes from an iterator all at once.
 	/// This is faster because sorting only needs to be done after all the keyframes have been inserted.
-	pub fn insert_many(&mut self, keyframes: impl IntoIterator<Item = impl Into<Keyframe<T>>>) -> Result<(), AnimationSequenceError> {
-		for k in keyframes { self.insert_into_vec(k.into())?; }
-		self.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+	pub fn insert_many(
+		&mut self,
+		keyframes: impl IntoIterator<Item = impl Into<Keyframe<T>>>,
+	) -> Result<(), AnimationSequenceError> {
+		for k in keyframes {
+			self.insert_into_vec(k.into())?;
+		}
+		self.sequence.sort_unstable_by(|k, k2| {
+			k.time
+				.partial_cmp(&k2.time)
+				.unwrap_or(core::cmp::Ordering::Equal)
+		});
 		self.update_current_keyframe();
 		Ok(())
 	}
 
 	/// Removes the keyframe from the sequence at the specified time. Returns true if a keyframe was actually removed
-	pub fn remove(&mut self, timestamp: f64) -> bool { self.retain(|t| t != timestamp) }
+	pub fn remove(&mut self, timestamp: f64) -> bool {
+		self.retain(|t| t != timestamp)
+	}
 	/// Removes all keyframes from this sequence
-	pub fn clear(&mut self) { self.retain(|_| false); }
+	pub fn clear(&mut self) {
+		self.retain(|_| false);
+	}
 
 	/// Retains only the keyframes specified by the predicate. Works the same as `Vec::retain`.
 	/// Returns true only if a keyframe was actually removed.
@@ -138,17 +160,22 @@ impl<T> AnimationSequence<T> {
 			}
 			self.update_current_keyframe();
 			true
+		} else {
+			false
 		}
-		else { false }
 	}
 
 	/// If this sequence has a keyframe at the exact timestamp
 	#[inline]
-	pub fn has_keyframe_at(&self, timestamp: f64) -> bool { self.into_iter().any(|k| k.time() == timestamp) }
+	pub fn has_keyframe_at(&self, timestamp: f64) -> bool {
+		self.into_iter().any(|k| k.time() == timestamp)
+	}
 
 	/// The number of keyframes in this sequence
 	#[inline]
-	pub fn keyframes(&self) -> usize { self.sequence.len() }
+	pub fn keyframes(&self) -> usize {
+		self.sequence.len()
+	}
 
 	/// The current pair of keyframes that are being animated (current, next)
 	///
@@ -164,12 +191,15 @@ impl<T> AnimationSequence<T> {
 			Some(c) if c == self.sequence.len() - 1 => (Some(&self.sequence[c]), None),
 			Some(c) => (Some(&self.sequence[c]), Some(&self.sequence[c + 1])),
 			None if self.sequence.len() > 0 => (None, Some(&self.sequence[0])),
-			None => (None, None)
+			None => (None, None),
 		}
 	}
 
 	/// The current value of this sequence, only based on the existing sequence entries.
-	pub fn now_strict(&self) -> Option<T> where T: CanTween + Copy {
+	pub fn now_strict(&self) -> Option<T>
+	where
+		T: CanTween + Copy,
+	{
 		match self.pair() {
 			(Some(s1), Some(s2)) => Some(s1.tween_to(s2, self.time)),
 			(Some(s1), None) => Some(s1.value()),
@@ -179,7 +209,10 @@ impl<T> AnimationSequence<T> {
 	}
 
 	/// The current value of this sequence, use the default if necessary.
-	pub fn now(&self) -> T where T: CanTween + Copy + Default {
+	pub fn now(&self) -> T
+	where
+		T: CanTween + Copy + Default,
+	{
 		match self.pair() {
 			(Some(s1), Some(s2)) => s1.tween_to(s2, self.time),
 			(Some(s1), None) => s1.value(),
@@ -247,7 +280,7 @@ impl<T> AnimationSequence<T> {
 		self.time = match timestamp {
 			_ if timestamp < 0.0 => 0.0,
 			_ if timestamp > self.duration() => self.duration(),
-			_ => timestamp
+			_ => timestamp,
 		};
 
 		self.update_current_keyframe();
@@ -258,23 +291,33 @@ impl<T> AnimationSequence<T> {
 	#[inline]
 	pub fn duration(&self) -> f64 {
 		// Keyframe::default means that if we don't have any items in this collection (meaning - 1 is out of bounds) the maximum time will be 0.0
-		self.sequence.get(self.sequence.len().saturating_sub(1)).map_or(0.0, |kf| kf.time)
+		self.sequence
+			.get(self.sequence.len().saturating_sub(1))
+			.map_or(0.0, |kf| kf.time)
 	}
 
 	/// The current progression of this sequence in seconds
 	#[inline]
-	pub fn time(&self) -> f64 { self.time }
+	pub fn time(&self) -> f64 {
+		self.time
+	}
 
 	/// The current progression of this sequence as a percentage
 	#[inline]
 	pub fn progress(&self) -> f64 {
-		if self.duration() == 0.0 { 0.0 } else { self.time / self.duration() }
+		if self.duration() == 0.0 {
+			0.0
+		} else {
+			self.time / self.duration()
+		}
 	}
 
 	/// If this sequence has finished and is at the end.
 	/// It can be reset with `advance_to(0.0)`.
 	#[inline]
-	pub fn finished(&self) -> bool { self.time == self.duration() }
+	pub fn finished(&self) -> bool {
+		self.time == self.duration()
+	}
 
 	/// Reverses the order of all keyframes in this sequence
 	pub fn reverse(&mut self) {
@@ -298,7 +341,9 @@ impl<T: Float + CanTween + Copy> AnimationSequence<T> {
 	/// # Note
 	///
 	/// This function is only implemented for one-dimensional float types, since each value corresponds to a Y position
-	pub fn to_easing_function(self) -> Keyframes { Keyframes::from_easing_function(self) }
+	pub fn to_easing_function(self) -> Keyframes {
+		Keyframes::from_easing_function(self)
+	}
 }
 
 impl<T> From<Vec<Keyframe<T>>> for AnimationSequence<T> {
@@ -308,10 +353,14 @@ impl<T> From<Vec<Keyframe<T>>> for AnimationSequence<T> {
 			sequence: vec,
 			keyframe: None,
 
-			time: 0.0
+			time: 0.0,
 		};
 
-		me.sequence.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(std::cmp::Ordering::Equal));
+		me.sequence.sort_unstable_by(|k, k2| {
+			k.time
+				.partial_cmp(&k2.time)
+				.unwrap_or(core::cmp::Ordering::Equal)
+		});
 		me.sequence.dedup_by_key(|k| k.time());
 		me.update_current_keyframe();
 
@@ -330,7 +379,7 @@ impl<T, I: Into<Keyframe<T>>> FromIterator<I> for AnimationSequence<T> {
 
 impl<'a, T> IntoIterator for &'a AnimationSequence<T> {
 	type Item = &'a Keyframe<T>;
-	type IntoIter = std::slice::Iter<'a, Keyframe<T>>;
+	type IntoIter = core::slice::Iter<'a, Keyframe<T>>;
 
 	#[inline]
 	fn into_iter(self) -> Self::IntoIter {
