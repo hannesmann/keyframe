@@ -13,7 +13,7 @@ keywords = ["animation", "transitions", "easing", "gamedev", "graphics"]
 categories = ["mathematics", "graphics"]
 
 [dependencies]
-num-traits = "0.2.10"
+num-traits = {version = "0.2.10", default-features = false}
 mint = { version = "0.5.6", optional = true }
 
 [dev-dependencies]
@@ -21,11 +21,12 @@ ggez = "0.6.0"
 num-derive = "0.3.3"
 
 [features]
-default = ["mint_types"]
+default = ["mint_types", "alloc"]
 
 # Defines easing functions for mint's Vector2, Vector3, Vector4, Point2 and Point3
 # Also required for BezierFunction
 mint_types = ["mint"]
+alloc = []
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "docs/preview.html" ]
