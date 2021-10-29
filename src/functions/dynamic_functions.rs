@@ -144,9 +144,20 @@ pub use bezier::*;
 pub struct Keyframes([f64; SAMPLE_TABLE_SIZE]);
 
 impl Keyframes {
-	pub(crate) fn from_easing_function<T: Float + CanTween + Copy>(mut s: AnimationSequence<T>) -> Self {
-		let mut low_point = s.sequence.get(0).and_then(|kf| kf.value().to_f64()).unwrap_or(0.0);
-		let mut high_point = s.sequence.get(s.keyframes() - 1).and_then(|kf| kf.value().to_f64()).unwrap_or(1.0);
+	#[cfg(feature = "alloc")]
+	pub(crate) fn from_easing_function<T: Float + CanTween + Copy>(
+		mut s: AnimationSequence<T>,
+	) -> Self {
+		let mut low_point = s
+			.sequence
+			.get(0)
+			.and_then(|kf| kf.value().to_f64())
+			.unwrap_or(0.0);
+		let mut high_point = s
+			.sequence
+			.get(s.keyframes() - 1)
+			.and_then(|kf| kf.value().to_f64())
+			.unwrap_or(1.0);
 		let max_time = s.duration();
 
 		if high_point == 0.0 || high_point == low_point {
@@ -157,7 +168,8 @@ impl Keyframes {
 		let mut sample_table = [0.0; SAMPLE_TABLE_SIZE];
 		for i in 0..SAMPLE_TABLE_SIZE {
 			s.advance_to((i as f64 / (SAMPLE_TABLE_SIZE - 1) as f64) * max_time);
-			sample_table[i] = (s.now_strict().and_then(|v| v.to_f64()).unwrap_or(0.5) - low_point) / (high_point - low_point);
+			sample_table[i] = (s.now_strict().and_then(|v| v.to_f64()).unwrap_or(0.5) - low_point)
+				/ (high_point - low_point);
 		}
 
 		Keyframes(sample_table)
