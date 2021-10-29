@@ -9,6 +9,19 @@
 //! [`AnimationSequence`](struct.AnimationSequence.html) can be used to create more complex animations that keep track of keyframes, time, etc.
 //! You can create animation sequences with the [`keyframes![...]`](macro.keyframes.html) macro, from an iterator or from a vector.
 //!
+//! ## Embedded
+//!
+//! This library is embedded compatible. As default it uses the `alloc` crate for dynamic memory usage. So, if the `alloc` feature is turned off,
+//! by setting `default-features = false`, this `crate` can be used without dynamic memory usage. Keep in mind that this will disable the feature `mint_types`
+//! as well. This must be enabled by hand again.
+//!
+//! Disabled features:
+//! - [Keyframe]
+//! - [Sequence]
+//! - impl [CanTween] for [alloc::vec::Vec]
+//! - [Keyframes::from_easing_function()]
+//!
+//!
 //! ## Examples
 //!
 //! An example visualizer is included in `examples/`. Run `cargo run --example visualizer --release` to start it. (ggez is really slow in debug mode!)
