@@ -9,7 +9,9 @@ use crate::easing::*;
 pub struct Linear;
 impl EasingFunction for Linear {
 	#[inline]
-	fn y(&self, x: f64) -> f64 { x }
+	fn y(&self, x: f64) -> f64 {
+		x
+	}
 }
 
 /// Step function, returns the closest to either point A or B
@@ -18,7 +20,9 @@ impl EasingFunction for Linear {
 pub struct Step;
 impl EasingFunction for Step {
 	#[inline]
-	fn y(&self, x: f64) -> f64 { x.round() }
+	fn y(&self, x: f64) -> f64 {
+		x.round()
+	}
 }
 
 /// Accelerating quadratically from point A to point B
@@ -27,7 +31,9 @@ impl EasingFunction for Step {
 pub struct EaseInQuad;
 impl EasingFunction for EaseInQuad {
 	#[inline]
-	fn y(&self, x: f64) -> f64 { x * x }
+	fn y(&self, x: f64) -> f64 {
+		x * x
+	}
 }
 
 /// Decelerating quadratically from point A to point B
@@ -36,7 +42,9 @@ impl EasingFunction for EaseInQuad {
 pub struct EaseOutQuad;
 impl EasingFunction for EaseOutQuad {
 	#[inline]
-	fn y(&self, x: f64) -> f64 { x * (2.0 - x) }
+	fn y(&self, x: f64) -> f64 {
+		x * (2.0 - x)
+	}
 }
 
 /// Accelerating then decelerating quadratically from point A to point B
@@ -46,7 +54,11 @@ pub struct EaseInOutQuad;
 impl EasingFunction for EaseInOutQuad {
 	#[inline]
 	fn y(&self, x: f64) -> f64 {
-		if x < 0.5 { 2.0 * x * x } else { -1.0 + (4.0 - 2.0 * x) * x }
+		if x < 0.5 {
+			2.0 * x * x
+		} else {
+			-1.0 + (4.0 - 2.0 * x) * x
+		}
 	}
 }
 
@@ -56,7 +68,9 @@ impl EasingFunction for EaseInOutQuad {
 pub struct EaseInCubic;
 impl EasingFunction for EaseInCubic {
 	#[inline]
-	fn y(&self, x: f64) -> f64 { x * x * x }
+	fn y(&self, x: f64) -> f64 {
+		x * x * x
+	}
 }
 
 /// Decelerating cubically from point A to point B
@@ -78,8 +92,9 @@ pub struct EaseInOutCubic;
 impl EasingFunction for EaseInOutCubic {
 	#[inline]
 	fn y(&self, x: f64) -> f64 {
-		if x < 0.5 { 4.0 * x * x * x }
-		else {
+		if x < 0.5 {
+			4.0 * x * x * x
+		} else {
 			let x_minus_one = x - 1.0;
 			x_minus_one * (2.0 * x - 2.0) * (2.0 * x - 2.0) + 1.0
 		}
@@ -92,7 +107,9 @@ impl EasingFunction for EaseInOutCubic {
 pub struct EaseInQuart;
 impl EasingFunction for EaseInQuart {
 	#[inline]
-	fn y(&self, x: f64) -> f64 { x * x * x * x }
+	fn y(&self, x: f64) -> f64 {
+		x * x * x * x
+	}
 }
 
 /// Decelerating quartically from point A to point B
@@ -114,8 +131,9 @@ pub struct EaseInOutQuart;
 impl EasingFunction for EaseInOutQuart {
 	#[inline]
 	fn y(&self, x: f64) -> f64 {
-		if x < 0.5 { 8.0 * x * x * x * x }
-		else {
+		if x < 0.5 {
+			8.0 * x * x * x * x
+		} else {
 			let x_minus_one = x - 1.0;
 			1.0 - 8.0 * x_minus_one * x_minus_one * x_minus_one * x_minus_one
 		}
@@ -128,7 +146,9 @@ impl EasingFunction for EaseInOutQuart {
 pub struct EaseInQuint;
 impl EasingFunction for EaseInQuint {
 	#[inline]
-	fn y(&self, x: f64) -> f64 { x * x * x * x * x }
+	fn y(&self, x: f64) -> f64 {
+		x * x * x * x * x
+	}
 }
 
 /// Decelerating quintically from point A to point B
@@ -150,8 +170,9 @@ pub struct EaseInOutQuint;
 impl EasingFunction for EaseInOutQuint {
 	#[inline]
 	fn y(&self, x: f64) -> f64 {
-		if x < 0.5 { 16.0 * x * x * x * x * x }
-		else {
+		if x < 0.5 {
+			16.0 * x * x * x * x * x
+		} else {
 			let x_minus_one = x - 1.0;
 			1.0 + 16.0 * x_minus_one * x_minus_one * x_minus_one * x_minus_one * x_minus_one
 		}
