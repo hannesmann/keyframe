@@ -165,7 +165,7 @@ pub struct EaseIn;
 impl EasingFunction for EaseIn {
 	#[inline]
 	fn y(&self, x: f64) -> f64 {
-		((x - 1.0) * std::f64::consts::FRAC_PI_2).sin() + 1.0
+		((x - 1.0) * core::f64::consts::FRAC_PI_2).sin() + 1.0
 	}
 }
 
@@ -176,7 +176,7 @@ pub struct EaseOut;
 impl EasingFunction for EaseOut {
 	#[inline]
 	fn y(&self, x: f64) -> f64 {
-		(x * std::f64::consts::FRAC_PI_2).sin()
+		(x * core::f64::consts::FRAC_PI_2).sin()
 	}
 }
 
@@ -187,6 +187,6 @@ pub struct EaseInOut;
 impl EasingFunction for EaseInOut {
 	#[inline]
 	fn y(&self, x: f64) -> f64 {
-		0.5 * (1.0 - (x * std::f64::consts::PI).cos())
+		0.5 * (1.0 - (x * core::f64::consts::PI).cos())
 	}
 }
