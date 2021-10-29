@@ -73,13 +73,13 @@
 //! ```
 #![no_std]
 
-pub use num_traits;
 #[cfg(feature = "mint_types")]
 pub use mint;
+pub use num_traits;
 
-pub(crate) use num_traits::Float;
 #[cfg(feature = "mint_types")]
-pub(crate) use mint::{Vector2, Vector3, Vector4, Point2, Point3};
+pub(crate) use mint::{Point2, Point3, Vector2, Vector3, Vector4};
+pub(crate) use num_traits::Float;
 
 #[cfg(feature = "alloc")]
 extern crate alloc;
