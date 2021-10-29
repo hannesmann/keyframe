@@ -43,9 +43,10 @@ impl CanTween for f64 {
 	}
 }
 
-impl<T: CanTween> CanTween for Vec<T> {
+#[cfg(feature = "alloc")]
+impl<T: CanTween> CanTween for alloc::vec::Vec<T> {
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
-		let mut new_vec = Vec::with_capacity(from.len());
+		let mut new_vec = alloc::vec::Vec::with_capacity(from.len());
 
 		let from_iterator = from.into_iter();
 		let to_iterator = to.into_iter();
