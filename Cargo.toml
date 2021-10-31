@@ -13,7 +13,7 @@ keywords = ["animation", "transitions", "easing", "gamedev", "graphics"]
 categories = ["mathematics", "graphics"]
 
 [dependencies]
-num-traits = {version = "0.2.10", default-features = false}
+num-traits = {version = "0.2.10", default-features = false, features = ["libm"]}
 mint = { version = "0.5.6", optional = true }
 
 [dev-dependencies]
