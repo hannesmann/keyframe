@@ -5,7 +5,7 @@ description = "A simple library for animation in Rust"
 readme = "README.md"
 repository = "https://github.com/HannesMann/keyframe"
 license = "MIT"
-version = "1.1.4"
+version = "1.1.0"
 edition = "2018"
 
 authors = ["Hannes Mann <hannesmann2000@gmail.com>"]
