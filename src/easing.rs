@@ -1,6 +1,9 @@
+use core::borrow::Borrow;
+
 pub(crate) use crate::*;
 
-use std::borrow::Borrow;
+#[cfg(feature = "mint_types")]
+pub use mint_type_impls::*;
 
 /// Implementation of a 2D curve function for easing between two points
 pub trait EasingFunction {
@@ -40,9 +43,10 @@ impl CanTween for f64 {
 	}
 }
 
-impl<T: CanTween> CanTween for Vec<T> {
+#[cfg(feature = "alloc")]
+impl<T: CanTween> CanTween for alloc::vec::Vec<T> {
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
-		let mut new_vec = Vec::with_capacity(from.len());
+		let mut new_vec = alloc::vec::Vec::with_capacity(from.len());
 
 		let from_iterator = from.into_iter();
 		let to_iterator = to.into_iter();
@@ -62,30 +66,56 @@ impl<T: CanTween> CanTween for Vec<T> {
 /// Returns the value at a specified X position on the curve between point A and point B.
 /// The time argument is expected to stay within a range of 0.0 to 1.0 but bounds checking is not enforced.
 #[inline]
-pub fn ease_with_unbounded_time<V: CanTween, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: impl Float) -> V {
+pub fn ease_with_unbounded_time<V: CanTween, F: EasingFunction>(
+	function: impl Borrow<F>,
+	from: V,
+	to: V,
+	time: impl Float,
+) -> V {
 	V::ease(from, to, function.borrow().y(as_f64(time)))
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B.
 /// Time is limited to a range between 0.0 and 1.0.
 #[inline]
-pub fn ease<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: T) -> V {
-	ease_with_unbounded_time(function, from, to, match time {
-		_ if time < T::zero() => T::zero(),
-		 _ if time > T::one() => T::one(),
-		_ => time
-	})
+pub fn ease<V: CanTween, T: Float, F: EasingFunction>(
+	function: impl Borrow<F>,
+	from: V,
+	to: V,
+	time: T,
+) -> V {
+	ease_with_unbounded_time(
+		function,
+		from,
+		to,
+		match time {
+			_ if time < T::zero() => T::zero(),
+			_ if time > T::one() => T::one(),
+			_ => time,
+		},
+	)
 }
 
 /// Returns the value at a specified X position on the curve between point A and point B.
 /// Time is limited to a range between 0.0 and `max_time`.
 #[inline]
-pub fn ease_with_scaled_time<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: T, max_time: T) -> V {
-	ease(function, from, to, match time {
-		_ if time < T::zero() => T::zero(),
-		_ if time > max_time => T::one(),
-		_ => time / max_time
-	})
+pub fn ease_with_scaled_time<V: CanTween, T: Float, F: EasingFunction>(
+	function: impl Borrow<F>,
+	from: V,
+	to: V,
+	time: T,
+	max_time: T,
+) -> V {
+	ease(
+		function,
+		from,
+		to,
+		match time {
+			_ if time < T::zero() => T::zero(),
+			_ if time > max_time => T::one(),
+			_ => time / max_time,
+		},
+	)
 }
 
 #[cfg(feature = "mint_types")]
@@ -97,7 +127,7 @@ mod mint_type_impls {
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: V::ease(from.x, to.x, time),
-				y: V::ease(from.y, to.y, time)
+				y: V::ease(from.y, to.y, time),
 			}
 		}
 	}
@@ -108,7 +138,7 @@ mod mint_type_impls {
 			Self {
 				x: V::ease(from.x, to.x, time),
 				y: V::ease(from.y, to.y, time),
-				z: V::ease(from.z, to.z, time)
+				z: V::ease(from.z, to.z, time),
 			}
 		}
 	}
@@ -120,7 +150,7 @@ mod mint_type_impls {
 				x: V::ease(from.x, to.x, time),
 				y: V::ease(from.y, to.y, time),
 				z: V::ease(from.z, to.z, time),
-				w: V::ease(from.w, to.w, time)
+				w: V::ease(from.w, to.w, time),
 			}
 		}
 	}
@@ -130,7 +160,7 @@ mod mint_type_impls {
 		fn ease(from: Self, to: Self, time: impl Float) -> Self {
 			Self {
 				x: V::ease(from.x, to.x, time),
-				y: V::ease(from.y, to.y, time)
+				y: V::ease(from.y, to.y, time),
 			}
 		}
 	}
@@ -141,11 +171,8 @@ mod mint_type_impls {
 			Self {
 				x: V::ease(from.x, to.x, time),
 				y: V::ease(from.y, to.y, time),
-				z: V::ease(from.z, to.z, time)
+				z: V::ease(from.z, to.z, time),
 			}
 		}
 	}
 }
-
-#[cfg(feature = "mint_types")]
-pub use mint_type_impls::*;
