@@ -77,7 +77,8 @@
 //!     a: f64,
 //!     b: Point2<f64>,
 //!     c: f32,
-//!     d: Vec<MySubStructure> // BEWARE! This will panic if "from" and "to" are different lengths.
+//!     d: Vec<MySubStructure> // Panics if "from" and "to" are different lengths.
+//!                            // To be consistent with other implementations of CanTween this will return a new Vec<T> when ease() is called.
 //! }
 //!
 //! // Also works with unnamed structures
