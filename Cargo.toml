@@ -6,18 +6,20 @@ readme = "README.md"
 repository = "https://github.com/HannesMann/keyframe"
 license = "MIT"
 version = "1.1.0"
+
 edition = "2018"
+rust-version = "1.51"
 
 authors = ["Hannes Mann <hannesmann2000@gmail.com>"]
 keywords = ["animation", "transitions", "easing", "gamedev", "graphics"]
 categories = ["mathematics", "graphics"]
 
 [dependencies]
-num-traits = {version = "0.2.10", default-features = false, features = ["libm"]}
-mint = { version = "0.5.6", optional = true }
+num-traits = {version = "0.2.15", default-features = false, features = ["libm"]}
+mint = { version = "0.5.9", optional = true }
 
 [dev-dependencies]
-ggez = "0.6.0"
+ggez = "0.7.0"
 num-derive = "0.3.3"
 
 [features]
