@@ -74,8 +74,7 @@ struct MyStructure {
     a: f64,
     b: Point2<f64>,
     c: f32,
-    d: Vec<MySubStructure> // Panics if "from" and "to" are different lengths.
-                           // To be consistent with other implementations of CanTween this will return a new Vec<T> when ease() is called.
+    d: [MySubStructure; N] // Array length matching is guaranteed by the type system
 }
 
 // Also works with unnamed structures

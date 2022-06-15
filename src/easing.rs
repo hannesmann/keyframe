@@ -1,4 +1,5 @@
 use core::borrow::Borrow;
+use core::mem::MaybeUninit;
 
 pub(crate) use crate::*;
 
@@ -43,23 +44,26 @@ impl CanTween for f64 {
 	}
 }
 
-#[cfg(feature = "alloc")]
-impl<T: CanTween> CanTween for alloc::vec::Vec<T> {
+impl<T: CanTween, const N: usize> CanTween for [T; N] {
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
-		let mut new_vec = alloc::vec::Vec::with_capacity(from.len());
+		// This is safe, see: https://doc.rust-lang.org/core/mem/union.MaybeUninit.html#initializing-an-array-element-by-element
+		let mut result_uninit: [MaybeUninit<T>; N] = unsafe { MaybeUninit::uninit().assume_init() };
+		let mut i = 0;
 
-		let from_iterator = from.into_iter();
-		let to_iterator = to.into_iter();
-
-		if from_iterator.len() != to_iterator.len() {
-			panic!("Tweening between two vectors can only be done when they are the same size.");
+		for (f, t) in IntoIterator::into_iter(from).zip(IntoIterator::into_iter(to)) {
+			// Initialize the array while moving elements out of from and to...
+			result_uninit[i].write(T::ease(f, t, time));
+			i += 1;
 		}
 
-		for (f, t) in from_iterator.zip(to_iterator) {
-			new_vec.push(T::ease(f, t, time));
-		}
+		unsafe {
+			// MaybeUninit<T> is guaranteed to have the same size, alignment, and ABI as T.
+			let ptr = result_uninit.as_mut_ptr() as *mut [T; N];
+			let result = ptr.read();
+			core::mem::forget(result_uninit);
 
-		new_vec
+			result
+		}
 	}
 }
 
