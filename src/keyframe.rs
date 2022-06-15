@@ -58,9 +58,9 @@ impl<T> Keyframe<T> {
 	#[inline]
 	pub fn value(&self) -> T
 	where
-		T: Copy,
+		T: Clone,
 	{
-		self.value
+		self.value.clone()
 	}
 
 	/// The time in seconds at which this keyframe starts in a sequence
@@ -86,19 +86,19 @@ impl<T> Keyframe<T> {
 	#[inline]
 	pub fn tween_to(&self, next: &Keyframe<T>, time: impl Float) -> T
 	where
-		T: CanTween + Copy,
+		T: CanTween + Clone,
 	{
 		match as_f64(time) {
 			// If the requested time starts before this keyframe
-			time if time < self.time => self.value,
+			time if time < self.time => self.value.clone(),
 			// If the requested time starts after the next keyframe
-			time if time > next.time => next.value,
+			time if time > next.time => next.value.clone(),
 			// If the next keyframe starts before this keyframe
-			_ if next.time < self.time => next.value,
+			_ if next.time < self.time => next.value.clone(),
 
 			time => T::ease(
-				self.value,
-				next.value,
+				self.value.clone(),
+				next.value.clone(),
 				self.function.y(ease_with_scaled_time(
 					Linear,
 					0.0,

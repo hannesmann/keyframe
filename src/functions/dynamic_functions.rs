@@ -170,7 +170,7 @@ pub struct Keyframes([f64; SAMPLE_TABLE_SIZE]);
 
 impl Keyframes {
 	#[cfg(feature = "alloc")]
-	pub(crate) fn from_easing_function<T: Float + CanTween + Copy>(
+	pub(crate) fn from_easing_function<T: Float + CanTween + Clone>(
 		mut s: AnimationSequence<T>,
 	) -> Self {
 		let mut low_point = s

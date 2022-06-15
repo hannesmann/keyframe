@@ -198,7 +198,7 @@ impl<T> AnimationSequence<T> {
 	/// The current value of this sequence, only based on the existing sequence entries.
 	pub fn now_strict(&self) -> Option<T>
 	where
-		T: CanTween + Copy,
+		T: CanTween + Clone,
 	{
 		match self.pair() {
 			(Some(s1), Some(s2)) => Some(s1.tween_to(s2, self.time)),
@@ -211,7 +211,7 @@ impl<T> AnimationSequence<T> {
 	/// The current value of this sequence, use the default if necessary.
 	pub fn now(&self) -> T
 	where
-		T: CanTween + Copy + Default,
+		T: CanTween + Clone + Default,
 	{
 		match self.pair() {
 			(Some(s1), Some(s2)) => s1.tween_to(s2, self.time),
@@ -335,7 +335,7 @@ impl<T> AnimationSequence<T> {
 	}
 }
 
-impl<T: Float + CanTween + Copy> AnimationSequence<T> {
+impl<T: Float + CanTween + Clone> AnimationSequence<T> {
 	/// Consumes this sequence and creates a normalized easing function which controls the 2D curve according to the keyframes in this sequence
 	///
 	/// # Note
