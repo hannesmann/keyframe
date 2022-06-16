@@ -29,7 +29,7 @@ impl<T> Keyframe<T> {
 		function: impl EasingFunction + 'static + Send + Sync,
 	) -> Self {
 		Keyframe::<T> {
-			value: value,
+			value,
 			time: if time < F::zero() { 0.0 } else { as_f64(time) },
 			function: Box::new(function),
 		}
@@ -48,7 +48,7 @@ impl<T> Keyframe<T> {
 		function: Box<dyn EasingFunction + 'static + Send + Sync>,
 	) -> Self {
 		Keyframe::<T> {
-			value: value,
+			value,
 			time: if time < F::zero() { 0.0 } else { as_f64(time) },
 			function,
 		}

@@ -143,8 +143,8 @@ mod bezier {
 
 			BezierCurve {
 				sample_table: arr,
-				p1: p1,
-				p2: p2,
+				p1,
+				p2,
 			}
 		}
 	}
@@ -191,10 +191,10 @@ impl Keyframes {
 		}
 
 		let mut sample_table = [0.0; SAMPLE_TABLE_SIZE];
-		for i in 0..SAMPLE_TABLE_SIZE {
+
+		for (i, item) in sample_table.iter_mut().enumerate() {
 			s.advance_to((i as f64 / (SAMPLE_TABLE_SIZE - 1) as f64) * max_time);
-			sample_table[i] = (s.now_strict().and_then(|v| v.to_f64()).unwrap_or(0.5) - low_point)
-				/ (high_point - low_point);
+			*item = (s.now_strict().and_then(|v| v.to_f64()).unwrap_or(0.5) - low_point) / (high_point - low_point);
 		}
 
 		Keyframes(sample_table)

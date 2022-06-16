@@ -104,10 +104,8 @@ pub(crate) fn as_t<T: Float>(value: f64) -> T {
 		_ if value > as_f64(T::max_value()) => T::max_value(),
 		_ if value < as_f64(T::min_value()) => T::min_value(),
 		#[cfg(feature = "alloc")]
-		_ => T::from(value).expect(&alloc::format!(
-			"{} not representable in chosen float type",
-			value
-		)),
+		_ => T::from(value).unwrap_or_else(|| panic!("{} not representable in chosen float type",
+			value)),
 		#[cfg(not(feature = "alloc"))]
 		_ => T::from(value).expect("value not representable in chosen float type"),
 	}

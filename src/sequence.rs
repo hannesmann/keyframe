@@ -39,11 +39,11 @@ impl<T> AnimationSequence<T> {
 
 	fn update_current_keyframe(&mut self) {
 		// Common cases, reversing/wrapping
-		if self.sequence.len() > 0 && self.time == 0.0 {
+		if !self.sequence.is_empty() && self.time == 0.0 {
 			self.keyframe = Some(0);
 			return;
 		}
-		if self.sequence.len() > 0 && self.time == self.duration() {
+		if !self.sequence.is_empty() && self.time == self.duration() {
 			self.keyframe = Some(self.sequence.len() - 1);
 			return;
 		}
@@ -190,7 +190,7 @@ impl<T> AnimationSequence<T> {
 		match self.keyframe {
 			Some(c) if c == self.sequence.len() - 1 => (Some(&self.sequence[c]), None),
 			Some(c) => (Some(&self.sequence[c]), Some(&self.sequence[c + 1])),
-			None if self.sequence.len() > 0 => (None, Some(&self.sequence[0])),
+			None if !self.sequence.is_empty() => (None, Some(&self.sequence[0])),
 			None => (None, None),
 		}
 	}
@@ -383,7 +383,7 @@ impl<'a, T> IntoIterator for &'a AnimationSequence<T> {
 
 	#[inline]
 	fn into_iter(self) -> Self::IntoIter {
-		self.sequence.as_slice().into_iter()
+		self.sequence.as_slice().iter()
 	}
 }
 

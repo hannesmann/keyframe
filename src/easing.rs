@@ -48,12 +48,10 @@ impl<T: CanTween, const N: usize> CanTween for [T; N] {
 	fn ease(from: Self, to: Self, time: impl Float) -> Self {
 		// This is safe, see: https://doc.rust-lang.org/core/mem/union.MaybeUninit.html#initializing-an-array-element-by-element
 		let mut result_uninit: [MaybeUninit<T>; N] = unsafe { MaybeUninit::uninit().assume_init() };
-		let mut i = 0;
 
-		for (f, t) in IntoIterator::into_iter(from).zip(IntoIterator::into_iter(to)) {
+		for (i, (f, t)) in IntoIterator::into_iter(from).zip(IntoIterator::into_iter(to)).enumerate() {
 			// Initialize the array while moving elements out of from and to...
 			result_uninit[i].write(T::ease(f, t, time));
-			i += 1;
 		}
 
 		unsafe {
