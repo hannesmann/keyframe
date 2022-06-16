@@ -108,11 +108,8 @@ impl<T> AnimationSequence<T> {
 					// * the item that comes next also has a later time
 					// * the first item has the earliest time
 					// * the last item has the last time (useful for remove_at)
-					self.sequence.sort_unstable_by(|k, k2| {
-						k.time
-							.partial_cmp(&k2.time)
-							.unwrap_or(core::cmp::Ordering::Equal)
-					});
+					self.sequence
+						.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(core::cmp::Ordering::Equal));
 				}
 			}
 
@@ -130,11 +127,8 @@ impl<T> AnimationSequence<T> {
 		for k in keyframes {
 			self.insert_into_vec(k.into())?;
 		}
-		self.sequence.sort_unstable_by(|k, k2| {
-			k.time
-				.partial_cmp(&k2.time)
-				.unwrap_or(core::cmp::Ordering::Equal)
-		});
+		self.sequence
+			.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(core::cmp::Ordering::Equal));
 		self.update_current_keyframe();
 		Ok(())
 	}
@@ -356,11 +350,8 @@ impl<T> From<Vec<Keyframe<T>>> for AnimationSequence<T> {
 			time: 0.0,
 		};
 
-		me.sequence.sort_unstable_by(|k, k2| {
-			k.time
-				.partial_cmp(&k2.time)
-				.unwrap_or(core::cmp::Ordering::Equal)
-		});
+		me.sequence
+			.sort_unstable_by(|k, k2| k.time.partial_cmp(&k2.time).unwrap_or(core::cmp::Ordering::Equal));
 		me.sequence.dedup_by_key(|k| k.time());
 		me.update_current_keyframe();
 

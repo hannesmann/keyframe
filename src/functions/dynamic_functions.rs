@@ -64,9 +64,7 @@ mod bezier {
 			let mut i = 0;
 
 			let mut has_run_once = false;
-			while !has_run_once
-				|| current_x.abs() > SUBDIVISION_PRECISION && i + 1 < SUBDIVISION_MAX_ITERATIONS
-			{
+			while !has_run_once || current_x.abs() > SUBDIVISION_PRECISION && i + 1 < SUBDIVISION_MAX_ITERATIONS {
 				has_run_once = true;
 				current_t = a + (b - a) / 2.0;
 				current_x = Self::at(current_t, x1, x2) - x;
@@ -132,12 +130,10 @@ mod bezier {
 			let p2 = Self::convert_vector(p2);
 
 			let mut arr = [0.0; SAMPLE_TABLE_SIZE];
-			for (i, value) in (0..SAMPLE_TABLE_SIZE).enumerate().map(|x| {
-				(
-					x.0,
-					Self::at(x.1 as f32 * SAMPLE_TABLE_SIZE as f32, p1.x, p2.x),
-				)
-			}) {
+			for (i, value) in (0..SAMPLE_TABLE_SIZE)
+				.enumerate()
+				.map(|x| (x.0, Self::at(x.1 as f32 * SAMPLE_TABLE_SIZE as f32, p1.x, p2.x)))
+			{
 				arr[i] = value;
 			}
 
@@ -170,14 +166,8 @@ pub struct Keyframes([f64; SAMPLE_TABLE_SIZE]);
 
 impl Keyframes {
 	#[cfg(feature = "alloc")]
-	pub(crate) fn from_easing_function<T: Float + CanTween + Clone>(
-		mut s: AnimationSequence<T>,
-	) -> Self {
-		let mut low_point = s
-			.sequence
-			.get(0)
-			.and_then(|kf| kf.value().to_f64())
-			.unwrap_or(0.0);
+	pub(crate) fn from_easing_function<T: Float + CanTween + Clone>(mut s: AnimationSequence<T>) -> Self {
+		let mut low_point = s.sequence.get(0).and_then(|kf| kf.value().to_f64()).unwrap_or(0.0);
 		let mut high_point = s
 			.sequence
 			.get(s.keyframes() - 1)

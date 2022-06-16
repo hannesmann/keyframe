@@ -48,10 +48,9 @@ enum VisualizerExample {
 
 fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>> {
 	match example {
-		VisualizerExample::LinearTwoPoint => keyframes![
-			([0.0, 0.0].into(), 0.0, Linear),
-			([1.0, 1.0].into(), 1.0, Linear)
-		],
+		VisualizerExample::LinearTwoPoint => {
+			keyframes![([0.0, 0.0].into(), 0.0, Linear), ([1.0, 1.0].into(), 1.0, Linear)]
+		}
 		VisualizerExample::LinearFourPoint => keyframes![
 			([0.0, 0.0].into(), 0.0, Linear),
 			([0.2, 0.4].into(), 0.3, Linear),
@@ -70,14 +69,7 @@ fn match_sequence(example: &VisualizerExample) -> AnimationSequence<Point2<f32>>
 			for i in 0..=30 {
 				let sin = ((i as f32 / 30.0) * std::f32::consts::PI * 2.0).sin();
 				let cos = ((i as f32 / 30.0) * std::f32::consts::PI * 2.0).cos();
-				keyframes.push(
-					(
-						[sin * 0.5 + 0.5, cos * 0.5 + 0.5].into(),
-						i as f64 / 30.0,
-						Linear,
-					)
-						.into(),
-				);
+				keyframes.push(([sin * 0.5 + 0.5, cos * 0.5 + 0.5].into(), i as f64 / 30.0, Linear).into());
 			}
 
 			AnimationSequence::from(keyframes)
@@ -161,11 +153,7 @@ impl EventHandler<GameError> for Visualizer {
 		)?;
 
 		let t = Text::new(TextFragment {
-			text: format!(
-				"{:?} -> {:?}",
-				self.keyframes.pair().0,
-				self.keyframes.pair().1
-			),
+			text: format!("{:?} -> {:?}", self.keyframes.pair().0, self.keyframes.pair().1),
 			font: None,
 			scale: Some(PxScale::from(15.0)),
 			..Default::default()
@@ -197,19 +185,10 @@ impl EventHandler<GameError> for Visualizer {
 				.color(Color::BLACK),
 		)?;
 
-		let area = [
-			100.0,
-			160.0,
-			screen_size.0 - 100.0 * 2.0,
-			screen_size.1 - 160.0 * 2.0,
-		];
+		let area = [100.0, 160.0, screen_size.0 - 100.0 * 2.0, screen_size.1 - 160.0 * 2.0];
 		let now = std::time::Instant::now();
 		let kf_now = self.keyframes.now_strict().unwrap();
-		let point: Point2<f32> = [
-			area[0] + kf_now.x * area[2],
-			area[1] + (1.0 - kf_now.y) * area[3],
-		]
-		.into();
+		let point: Point2<f32> = [area[0] + kf_now.x * area[2], area[1] + (1.0 - kf_now.y) * area[3]].into();
 		self.time_in_crate += (std::time::Instant::now() - now).as_secs_f64();
 
 		let circle = Mesh::new_circle(
@@ -224,12 +203,7 @@ impl EventHandler<GameError> for Visualizer {
 
 		for k in &self.keyframes {
 			let text = Text::new(TextFragment {
-				text: format!(
-					"({:.1}, {:.1}) at {:.1} s",
-					k.value().x,
-					k.value().y,
-					k.time() * 2.0
-				),
+				text: format!("({:.1}, {:.1}) at {:.1} s", k.value().x, k.value().y, k.time() * 2.0),
 				font: None,
 				scale: Some(PxScale::from(14.0)),
 				..Default::default()
@@ -244,9 +218,7 @@ impl EventHandler<GameError> for Visualizer {
 			draw(
 				ctx,
 				&text,
-				DrawParam::default()
-					.dest(p)
-					.color(Color::new(0.83, 0.17, 0.12, 1.0)),
+				DrawParam::default().dest(p).color(Color::new(0.83, 0.17, 0.12, 1.0)),
 			)?;
 		}
 
@@ -273,8 +245,7 @@ impl EventHandler<GameError> for Visualizer {
 	}
 
 	fn resize_event(&mut self, ctx: &mut Context, width: f32, height: f32) {
-		set_screen_coordinates(ctx, [0.0, 0.0, width, height].into())
-			.expect("Couldn't resize screen");
+		set_screen_coordinates(ctx, [0.0, 0.0, width, height].into()).expect("Couldn't resize screen");
 	}
 
 	fn key_down_event(
@@ -294,20 +265,13 @@ impl EventHandler<GameError> for Visualizer {
 		};
 
 		if example < 0 {
-			example = unsafe {
-				std::mem::transmute::<VisualizerExample, i32>(VisualizerExample::Last) - 1
-			};
-		} else if example
-			>= unsafe { std::mem::transmute::<VisualizerExample, i32>(VisualizerExample::Last) }
-		{
+			example = unsafe { std::mem::transmute::<VisualizerExample, i32>(VisualizerExample::Last) - 1 };
+		} else if example >= unsafe { std::mem::transmute::<VisualizerExample, i32>(VisualizerExample::Last) } {
 			example = 0;
 		}
 
-		if self.example
-			!= FromPrimitive::from_i32(example).unwrap_or(VisualizerExample::LinearTwoPoint)
-		{
-			self.example =
-				FromPrimitive::from_i32(example).unwrap_or(VisualizerExample::LinearTwoPoint);
+		if self.example != FromPrimitive::from_i32(example).unwrap_or(VisualizerExample::LinearTwoPoint) {
+			self.example = FromPrimitive::from_i32(example).unwrap_or(VisualizerExample::LinearTwoPoint);
 			self.keyframes = match_sequence(&self.example);
 			self.time_in_crate += (std::time::Instant::now() - now).as_secs_f64();
 		}

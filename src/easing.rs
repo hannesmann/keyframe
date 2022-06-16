@@ -49,7 +49,10 @@ impl<T: CanTween, const N: usize> CanTween for [T; N] {
 		// This is safe, see: https://doc.rust-lang.org/core/mem/union.MaybeUninit.html#initializing-an-array-element-by-element
 		let mut result_uninit: [MaybeUninit<T>; N] = unsafe { MaybeUninit::uninit().assume_init() };
 
-		for (i, (f, t)) in IntoIterator::into_iter(from).zip(IntoIterator::into_iter(to)).enumerate() {
+		for (i, (f, t)) in IntoIterator::into_iter(from)
+			.zip(IntoIterator::into_iter(to))
+			.enumerate()
+		{
 			// Initialize the array while moving elements out of from and to...
 			result_uninit[i].write(T::ease(f, t, time));
 		}
@@ -80,12 +83,7 @@ pub fn ease_with_unbounded_time<V: CanTween, F: EasingFunction>(
 /// Returns the value at a specified X position on the curve between point A and point B.
 /// Time is limited to a range between 0.0 and 1.0.
 #[inline]
-pub fn ease<V: CanTween, T: Float, F: EasingFunction>(
-	function: impl Borrow<F>,
-	from: V,
-	to: V,
-	time: T,
-) -> V {
+pub fn ease<V: CanTween, T: Float, F: EasingFunction>(function: impl Borrow<F>, from: V, to: V, time: T) -> V {
 	ease_with_unbounded_time(
 		function,
 		from,

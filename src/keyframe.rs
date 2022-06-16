@@ -23,11 +23,7 @@ impl<T> Keyframe<T> {
 	/// * `time` - The start time in seconds of this keyframe
 	/// * `function` - The easing function to use from the start of this keyframe to the start of the next keyframe
 	#[inline]
-	pub fn new<F: Float>(
-		value: T,
-		time: F,
-		function: impl EasingFunction + 'static + Send + Sync,
-	) -> Self {
+	pub fn new<F: Float>(value: T, time: F, function: impl EasingFunction + 'static + Send + Sync) -> Self {
 		Keyframe::<T> {
 			value,
 			time: if time < F::zero() { 0.0 } else { as_f64(time) },
@@ -42,11 +38,7 @@ impl<T> Keyframe<T> {
 	/// * `time` - The start time in seconds of this keyframe
 	/// * `function` - The easing function to use from the start of this keyframe to the start of the next keyframe
 	#[inline]
-	pub fn new_dynamic<F: Float>(
-		value: T,
-		time: F,
-		function: Box<dyn EasingFunction + 'static + Send + Sync>,
-	) -> Self {
+	pub fn new_dynamic<F: Float>(value: T, time: F, function: Box<dyn EasingFunction + 'static + Send + Sync>) -> Self {
 		Keyframe::<T> {
 			value,
 			time: if time < F::zero() { 0.0 } else { as_f64(time) },
@@ -149,10 +141,6 @@ impl<T: fmt::Display> fmt::Display for Keyframe<T> {
 impl<T: core::fmt::Debug> fmt::Debug for Keyframe<T> {
 	#[inline]
 	fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-		write!(
-			f,
-			"Keyframe {{ value: {:?}, time: {:.2} }}",
-			self.value, self.time
-		)
+		write!(f, "Keyframe {{ value: {:?}, time: {:.2} }}", self.value, self.time)
 	}
 }
