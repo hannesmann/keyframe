@@ -25,6 +25,17 @@ impl EasingFunction for Step {
 	}
 }
 
+/// Hold function, always returns A
+///
+/// <div class="function-preview" data-function="0"></div>
+pub struct Hold;
+impl EasingFunction for Step {
+	#[inline]
+	fn y(&self, _x: f64) -> f64 {
+		0
+	}
+}
+
 /// Accelerating quadratically from point A to point B
 ///
 /// <div class="function-preview" data-function="t * t"></div>
