@@ -29,10 +29,10 @@ impl EasingFunction for Step {
 ///
 /// <div class="function-preview" data-function="0"></div>
 pub struct Hold;
-impl EasingFunction for Step {
+impl EasingFunction for Hold {
 	#[inline]
 	fn y(&self, _x: f64) -> f64 {
-		0
+		0.0
 	}
 }
 
