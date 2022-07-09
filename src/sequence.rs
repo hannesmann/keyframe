@@ -15,7 +15,7 @@ pub enum AnimationSequenceError {
 }
 
 /// A collection of keyframes that can be played back in sequence
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct AnimationSequence<T> {
 	pub(crate) sequence: Vec<Keyframe<T>>,
 
