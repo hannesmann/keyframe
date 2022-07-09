@@ -160,7 +160,7 @@ mod bezier {
 #[cfg(feature = "mint_types")]
 pub use bezier::*;
 
-/// User-defined easing function which wraps a normalized [`AnimationSequence<Float>`](../struct.AnimationSequence.html)
+/// User-defined easing function which wraps a normalized [`AnimationSequence<Float>`]
 #[derive(Copy, Clone, Debug)]
 pub struct Keyframes([f64; SAMPLE_TABLE_SIZE]);
 

@@ -382,7 +382,7 @@ impl<'a, T> IntoIterator for &'a AnimationSequence<T> {
 ///
 /// # Note
 ///
-/// While this macro can be used with [`Keyframe::new`](struct.Keyframe.html#method.new) it's recommended to specify your keyframes with tuples (for shorter code) like this:
+/// While this macro can be used with [`Keyframe::new`] it's recommended to specify your keyframes with tuples (for shorter code) like this:
 /// ```ignore
 /// keyframes![(0.0, 0.0), (0.5, 1.0), (1.0, 2.0), (1.5, 3.0, EaseOut), (2.0, 4.0)]
 /// ```

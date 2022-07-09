@@ -3,10 +3,10 @@
 //! ## Usage
 //!
 //! Tweening between two values is done with [`ease(function, from, to, time)`](fn.ease.html).
-//! `from` and `to` can be any type that implements [`CanTween`](trait.CanTween.html), such as `f64` or `mint::Vector2`, while `time` needs to be a floating-point value between zero and one.
-//! `function` specifies the transition between `from` and `to` and is any type that implements [`EasingFunction`](trait.EasingFunction.html).
+//! `from` and `to` can be any type that implements [`CanTween`], such as `f64` or `mint::Vector2`, while `time` needs to be a floating-point value between zero and one.
+//! `function` specifies the transition between `from` and `to` and is any type that implements [`EasingFunction`].
 //!
-//! [`AnimationSequence`](struct.AnimationSequence.html) can be used to create more complex animations that keep track of keyframes, time, etc.
+//! [`AnimationSequence`] can be used to create more complex animations that keep track of keyframes, time, etc.
 //! You can create animation sequences with the [`keyframes![...]`](macro.keyframes.html) macro, from an iterator or from a vector.
 //!
 //! ## Embedded
@@ -16,9 +16,8 @@
 //! as well. This must be enabled by hand again.
 //!
 //! Disabled features:
-//! - [Keyframe]
-//! - [Sequence]
-//! - [Keyframes::from_easing_function()]
+//! - [`Keyframe`]
+//! - [`AnimationSequence`]
 //!
 //!
 //! ## Examples
@@ -47,12 +46,12 @@
 //! fn example() {
 //!    // (value, time) or (value, time, function)
 //!    let mut sequence = keyframes![
-//!         (0.5, 0.0), // <-- EaseInOut used from 0.0 to 0.3
-//!         (1.5, 0.3, Linear), // <-- Linear used from 0.3 to 1.0
-//!         (2.5, 1.0) // <-- Easing function here is never used, since we're at the end
+//!        (0.5, 0.0), // <-- EaseInOut used from 0.0 to 0.3
+//!        (1.5, 0.3, Linear), // <-- Linear used from 0.3 to 1.0
+//!        (2.5, 1.0) // <-- Easing function here is never used, since we're at the end
 //!    ];
 //!
-//!   sequence.advance_by(0.65);
+//!    sequence.advance_by(0.65);
 //!
 //!    assert_eq!(sequence.now(), 2.0);
 //!    assert_eq!(sequence.duration(), 1.0);
@@ -113,9 +112,9 @@ pub(crate) fn as_t<T: Float>(value: f64) -> T {
 /// Definitions for various easing functions
 ///
 /// <div class="function-preview" data-function="t" data-struct="Linear"></div>
-/// <div class="function-preview" data-function="t * t * t" data-struct="EaseIn"></div>
-/// <div class="function-preview" data-function="(--t) * t * t + 1" data-struct="EaseOut"></div>
-/// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1" data-struct="EaseInOut"></div>
+/// <div class="function-preview" data-function="Math.sin((t - 1) * Math.PI / 2) + 1" data-struct="EaseIn"></div>
+/// <div class="function-preview" data-function="Math.sin(t * Math.PI / 2)" data-struct="EaseOut"></div>
+/// <div class="function-preview" data-function=".5 * (1 - Math.cos(t * Math.PI))" data-struct="EaseInOut"></div>
 pub mod functions;
 use functions::*;
 

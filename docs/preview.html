@@ -9,17 +9,22 @@
 		height: 110px;
 
 		margin: 30px 40px 50px 20px;
+
+		/* Workaround for rustdoc overriding overflow-x */
+		overflow: initial !important;
 	}
 
 	.function-preview-ball {
 		width: 10px;
 		height: 10px;
-		background-color: #d62d20;
+		background-color: #F44336;
 		border-radius: 50%;
 
 		position: absolute;
 		right: -20px;
-		bottom: calc(5px - 1px - 5px); /* shift to start of graph, then compensate for line width, then for ball height */
+
+		/* Shift to start of graph, then compensate for line width, then for ball height */
+		bottom: calc(5px - 1px - 5px);
 	}
 
 	.function-preview-x, .function-preview-y, .function-preview-title {
@@ -27,18 +32,16 @@
 
 		position: absolute;
 		margin: 0px;
-		width: 20px;
-		height: 20px;
 
 		text-align: center;
 		vertical-align: middle;
 
-		font-family: "Source Code Pro", monospace;
+		font-family: monospace;
 		font-size: 13px;
 		font-weight: bold;
 		font-style: italic;
 
-		color: #d62d20;
+		color: #F44336;
 	}
 
 	.function-preview-x {
@@ -68,7 +71,7 @@
 	var lastScaleFactor = devicePixelRatio;
 	var lastTick = performance.now();
 
-	function drawOrRedrawPreviews() {
+	function redrawPreviews() {
 		document.querySelectorAll(".function-preview").forEach(function(val) {
 			console.log((val.hasChildNodes() ? "Redrawn " : "Drawn ") + "preview " + val.getAttribute("data-function"));
 			var canvas = val.hasChildNodes() ? val.getElementsByTagName("canvas")[0] : document.createElement("canvas");
@@ -89,12 +92,24 @@
 			ctx.clearRect(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]);
 
 			ctx.beginPath();
-			ctx.strokeStyle = "#d62d20";
+			ctx.strokeStyle = "#F44336";
 			ctx.lineWidth = 2 * devicePixelRatio;
 
 			ctx.moveTo(bounds[0], bounds[3]);
-			for(var x = 0; x <= 250; x += 10)
-				ctx.lineTo(bounds[0] + (x * devicePixelRatio), bounds[3] - (easingFunction(x / 250.0) * 100.0) * devicePixelRatio);
+			for(var x = 0; x <= 250; x += 5) {
+				var value = easingFunction(x / 250.0);
+				var targetX = bounds[0] + (x * devicePixelRatio);
+				var targetY = bounds[3] - (easingFunction(x / 250.0) * 100.0) * devicePixelRatio;
+				var diff = Math.abs(value - easingFunction((x - 1) / 250.0));
+
+				// Approximate discontinuous functions like Math.round(t)
+				if(diff < 0.5) {
+					ctx.lineTo(targetX, targetY);
+				}
+				else {
+					ctx.moveTo(targetX, targetY);
+				}
+			}
 
 			ctx.stroke();
 
@@ -117,7 +132,7 @@
 				val.appendChild(x);
 
 				var y = document.createElement("p");
-				y.innerText = "y";
+				y.innerText = "y(t)";
 				y.className = "function-preview-y";
 				val.appendChild(y);
 
@@ -133,10 +148,10 @@
 
 	}
 
-	document.addEventListener("DOMContentLoaded", drawOrRedrawPreviews);
+	document.addEventListener("DOMContentLoaded", redrawPreviews);
 	window.addEventListener("resize", function() {
 		if(devicePixelRatio != lastScaleFactor) {
-			drawOrRedrawPreviews();
+			redrawPreviews();
 			lastScaleFactor = devicePixelRatio;
 		}
 	}, true);
@@ -154,9 +169,9 @@
 				val.progress = 0;
 			}
 
-			var position = -102 * (val.reverse ? 1 - val.easingFunction(val.progress) : val.easingFunction(val.progress));
+			var position = -102 * (val.reverse ? val.easingFunction(1 - val.progress) : val.easingFunction(val.progress));
+
 			val.style.transform = "translateY(" + position + "px)";
-			val.style.opacity = 0.5 + 0.5 * (val.reverse ? val.easingFunction(val.progress) : 1 - val.easingFunction(val.progress));
 		});
 
 		window.requestAnimationFrame(tick);
