@@ -6,6 +6,7 @@ use crate::easing::*;
 /// Linear interpolation from point A to point B
 ///
 /// <div class="function-preview" data-function="t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Linear;
 impl EasingFunction for Linear {
 	#[inline]
@@ -17,6 +18,7 @@ impl EasingFunction for Linear {
 /// Step function, returns the closest to either point A or B
 ///
 /// <div class="function-preview" data-function="Math.round(t)"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Step;
 impl EasingFunction for Step {
 	#[inline]
@@ -28,6 +30,7 @@ impl EasingFunction for Step {
 /// Hold function, always returns A
 ///
 /// <div class="function-preview" data-function="0"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Hold;
 impl EasingFunction for Hold {
 	#[inline]
@@ -39,6 +42,7 @@ impl EasingFunction for Hold {
 /// Accelerating quadratically from point A to point B
 ///
 /// <div class="function-preview" data-function="t * t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInQuad;
 impl EasingFunction for EaseInQuad {
 	#[inline]
@@ -50,6 +54,7 @@ impl EasingFunction for EaseInQuad {
 /// Decelerating quadratically from point A to point B
 ///
 /// <div class="function-preview" data-function="t * (2-t)"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseOutQuad;
 impl EasingFunction for EaseOutQuad {
 	#[inline]
@@ -61,6 +66,7 @@ impl EasingFunction for EaseOutQuad {
 /// Accelerating then decelerating quadratically from point A to point B
 ///
 /// <div class="function-preview" data-function="t<.5 ? 2*t*t : -1+(4-2*t)*t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInOutQuad;
 impl EasingFunction for EaseInOutQuad {
 	#[inline]
@@ -76,6 +82,7 @@ impl EasingFunction for EaseInOutQuad {
 /// Accelerating cubically from point A to point B
 ///
 /// <div class="function-preview" data-function="t * t * t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInCubic;
 impl EasingFunction for EaseInCubic {
 	#[inline]
@@ -87,6 +94,7 @@ impl EasingFunction for EaseInCubic {
 /// Decelerating cubically from point A to point B
 ///
 /// <div class="function-preview" data-function="(--t) * t * t + 1"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseOutCubic;
 impl EasingFunction for EaseOutCubic {
 	#[inline]
@@ -99,6 +107,7 @@ impl EasingFunction for EaseOutCubic {
 /// Accelerating then decelerating cubically from point A to point B
 ///
 /// <div class="function-preview" data-function="t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInOutCubic;
 impl EasingFunction for EaseInOutCubic {
 	#[inline]
@@ -115,6 +124,7 @@ impl EasingFunction for EaseInOutCubic {
 /// Accelerating quartically from point A to point B
 ///
 /// <div class="function-preview" data-function="t*t*t*t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInQuart;
 impl EasingFunction for EaseInQuart {
 	#[inline]
@@ -126,6 +136,7 @@ impl EasingFunction for EaseInQuart {
 /// Decelerating quartically from point A to point B
 ///
 /// <div class="function-preview" data-function="1-(--t)*t*t*t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseOutQuart;
 impl EasingFunction for EaseOutQuart {
 	#[inline]
@@ -138,6 +149,7 @@ impl EasingFunction for EaseOutQuart {
 /// Accelerating then decelerating quartically from point A to point B
 ///
 /// <div class="function-preview" data-function="t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInOutQuart;
 impl EasingFunction for EaseInOutQuart {
 	#[inline]
@@ -154,6 +166,7 @@ impl EasingFunction for EaseInOutQuart {
 /// Accelerating quintically from point A to point B
 ///
 /// <div class="function-preview" data-function="t*t*t*t*t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInQuint;
 impl EasingFunction for EaseInQuint {
 	#[inline]
@@ -165,6 +178,7 @@ impl EasingFunction for EaseInQuint {
 /// Decelerating quintically from point A to point B
 ///
 /// <div class="function-preview" data-function="1+(--t)*t*t*t*t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseOutQuint;
 impl EasingFunction for EaseOutQuint {
 	#[inline]
@@ -177,6 +191,7 @@ impl EasingFunction for EaseOutQuint {
 /// Accelerating then decelerating quintically from point A to point B
 ///
 /// <div class="function-preview" data-function="t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInOutQuint;
 impl EasingFunction for EaseInOutQuint {
 	#[inline]
@@ -193,6 +208,7 @@ impl EasingFunction for EaseInOutQuint {
 /// Accelerating on 1/4 of a sine wave from point A to point B
 ///
 /// <div class="function-preview" data-function="Math.sin((t - 1) * Math.PI / 2) + 1"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseIn;
 impl EasingFunction for EaseIn {
 	#[inline]
@@ -204,6 +220,7 @@ impl EasingFunction for EaseIn {
 /// Decelerating on 1/4 of a sine wave from point A to point B
 ///
 /// <div class="function-preview" data-function="Math.sin(t * Math.PI / 2)"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseOut;
 impl EasingFunction for EaseOut {
 	#[inline]
@@ -215,6 +232,7 @@ impl EasingFunction for EaseOut {
 /// Accelerating then decelerating on 1/2 of a sine wave from point A to point B
 ///
 /// <div class="function-preview" data-function=".5 * (1 - Math.cos(t * Math.PI))"></div>
+#[derive(Copy, Clone, Debug, Default)]
 pub struct EaseInOut;
 impl EasingFunction for EaseInOut {
 	#[inline]
