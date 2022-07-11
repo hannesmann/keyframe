@@ -1,4 +1,4 @@
-use alloc::{boxed::Box, fmt};
+use alloc::{boxed::Box, fmt, sync::Arc};
 use num_traits::Float;
 
 use crate::{
@@ -8,10 +8,11 @@ use crate::{
 };
 
 /// Intermediate step in an animation sequence
+#[derive(Clone)]
 pub struct Keyframe<T> {
 	value: T,
 	pub(crate) time: f64,
-	function: Box<dyn EasingFunction + Send + Sync>,
+	function: Arc<dyn EasingFunction + Send + Sync>,
 }
 
 impl<T> Keyframe<T> {
@@ -27,7 +28,7 @@ impl<T> Keyframe<T> {
 		Keyframe::<T> {
 			value,
 			time: if time < F::zero() { 0.0 } else { as_f64(time) },
-			function: Box::new(function),
+			function: Arc::new(function),
 		}
 	}
 
@@ -42,7 +43,7 @@ impl<T> Keyframe<T> {
 		Keyframe::<T> {
 			value,
 			time: if time < F::zero() { 0.0 } else { as_f64(time) },
-			function,
+			function: function.into(),
 		}
 	}
 
